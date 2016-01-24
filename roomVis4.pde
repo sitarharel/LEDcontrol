@@ -47,6 +47,7 @@ import cc.arduino.*;
     }
 
     void setup() {
+        //frameRate(60);
         surface.setResizable(true);
         minim = new Minim(this);
         
@@ -63,7 +64,6 @@ import cc.arduino.*;
         song = minim.getLineIn();
         song.enableMonitoring();
         song.mute();
-        //fft = new FFT(song.bufferSize(), song.sampleRate());
         fft = new FFT(song.bufferSize(), 2048);
 
         for (int j = 0; j < specs.length; j++) {
@@ -221,9 +221,7 @@ import cc.arduino.*;
 
     void fadeCoded(int d) {
         //int[][] f = {{1, -1, 0},{-1, 0, 1},{1, 1, -1},{-1, -1, 1},{0, 1, -1},{1, -1, 1},{-1, 1, -1}};
-        int[][] rgb = {{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}, {0, -1, 0}, {1, 0, 0}, {0, 0, -1}};
-        int[][] f = rgb;
-        //System.out.println("f: " + f[fadenum][0] + ", " + f[fadenum][1] + ", " + f[fadenum][2]);
+        int[][] f = {{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}, {0, -1, 0}, {1, 0, 0}, {0, 0, -1}};
         currentfade = getNextFade(currentfade, f[fadenum][0], f[fadenum][1], f[fadenum][2]);
         int rq = (int) (constrain(currentfade[0], 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
         int gq = (int) (constrain(currentfade[1], 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
@@ -255,8 +253,8 @@ import cc.arduino.*;
         fill(0, 0, 200);
         stroke(0, 0, 255);
         rect(2 * width/9, height - (b * height/255) - 5, width / 9, 10, 5, 5, 5, 5);
-        //if(isarduino && (oldRGBoutput[0] != r || oldRGBoutput[1] != g || oldRGBoutput[2] != b)){
-        if(isarduino && (abs(oldRGBoutput[0] - r) > 1 || abs(oldRGBoutput[1] - g) > 1 || abs(oldRGBoutput[2] - b) > 1)){
+        int allowedchange = 1;
+        if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
             arduino.analogWrite(RED, r);
             arduino.analogWrite(GREEN, g);
             arduino.analogWrite(BLUE, b);
@@ -270,8 +268,9 @@ import cc.arduino.*;
         //int[] f = {c[0] + r * 5, c[1] + g * 5, c[2] + b * 5};
         float m = 0.0004, space = 1, exp = 2;
         float con = (m*pow(127.5, exp) + space);
-        int[] f = {(int)(c[0] + r * (-1*m*pow(c[0] - 127.5, exp) + con)), (int)(c[1] + g * (-1*m*pow(c[1] - 127.5, exp) + con)), (int)(c[2] + b * (-1*m*pow(c[2] - 127.5, exp) + con))};
-        //System.out.println(f[0] + ", " + f[1] + ", " + f[2]);
+        int[] f = {(int)(c[0] + r * (-1*m*pow(c[0] - 127.5, exp) + con)), (int)(c[1] + g * (-1*m*pow(c[1] - 127.5, exp) + con)), (int)(c[2] + b * (-1*m*pow(c[2] - 127.5, exp) + con))}; 
+        // this is a smoother, quadratic fade compared to the linear, first line of this method
+        //TODO make a switch for the fade mode to select fade type
         return f;
     }
 
