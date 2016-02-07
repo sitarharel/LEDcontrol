@@ -36,7 +36,7 @@ import cc.arduino.*;
     float powV = 3;
     float maxvel = 0.3;
     float ref = 1.15;
-    int avgamount = 2;
+    int avgamount = 15;
     int fdelay = 12;
     bar rbar, gbar, bbar, power, dim, white, refresh, maxv, fadespeed, smooth;
     flip stat;
