@@ -3,10 +3,11 @@ import ddf.minim.*;
 import ddf.minim.analysis.*;
 import cc.arduino.*;
 
-    Minim minim;
+    Minim  minim;
     AudioInput song;
     Arduino arduino;
-
+     Serial port;
+ 
     int GREEN = 3;
     int RED = 6;
     int BLUE = 9;
@@ -52,11 +53,8 @@ import cc.arduino.*;
         minim = new Minim(this);
         
         if (Arduino.list().length > 0) {
-            arduino = new Arduino(this, Arduino.list()[0], 57600);
-
-            arduino.pinMode(GREEN, Arduino.OUTPUT);
-            arduino.pinMode(RED, Arduino.OUTPUT);
-            arduino.pinMode(BLUE, Arduino.OUTPUT);
+             port = new Serial(this, Serial.list()[0], 57600);
+             
         } else {
             isarduino = false;
         }
@@ -124,10 +122,7 @@ import cc.arduino.*;
         stat.draw(0, 0, 255);
         state = stat.val + 1;
         if (!isarduino && Arduino.list().length > 0) {
-            arduino = new Arduino(this, Arduino.list()[0], 57600);
-            arduino.pinMode(GREEN, Arduino.OUTPUT);
-            arduino.pinMode(RED, Arduino.OUTPUT);
-            arduino.pinMode(BLUE, Arduino.OUTPUT);
+             port = new Serial(this, Serial.list()[0], 57600);
             isarduino = true;
         }
         if (isarduino && Arduino.list().length == 0) {
@@ -182,10 +177,6 @@ import cc.arduino.*;
 
     void musicVis() {
         stroke(255, 0, 0, 128);
-
-        //for(int i = 0; i < fft.specSize(); i++){
-        //line(i, 0, i, sqrt(fft.getBand(i))*100);
-        //}
 
         drawAvg(13, 0.3333, true);
         drawAvg(101, 0.333, false);
@@ -255,9 +246,11 @@ import cc.arduino.*;
         rect(2 * width/9, height - (b * height/255) - 5, width / 9, 10, 5, 5, 5, 5);
         int allowedchange = 1;
         if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
-            arduino.analogWrite(RED, r);
-            arduino.analogWrite(GREEN, g);
-            arduino.analogWrite(BLUE, b);
+            //arduino.analogWrite(RED, r);
+            //arduino.analogWrite(GREEN, g);
+            //arduino.analogWrite(BLUE, b);
+            byte[] send = {(byte)(r - 128), (byte)(g - 128), (byte)(b - 128)};
+            port.write(send);
             
             int[] nw = {r, g, b};
             oldRGBoutput = nw;
@@ -269,6 +262,14 @@ import cc.arduino.*;
         float m = 0.0004, space = 1, exp = 2;
         float con = (m*pow(127.5, exp) + space);
         int[] f = {(int)(c[0] + r * (-1*m*pow(c[0] - 127.5, exp) + con)), (int)(c[1] + g * (-1*m*pow(c[1] - 127.5, exp) + con)), (int)(c[2] + b * (-1*m*pow(c[2] - 127.5, exp) + con))}; 
+        
+        
+        //float m = 0.0004, space = 1, exp = 2;
+        //float con = (m*pow(127.5, exp) + space);
+        //con = 4000;
+        //int[] f = {(int)(c[0] + r * 0.001 * (-1*0.00001*pow(c[0] - 127.5, 4) -0.0001*pow(c[0] - 127.5, 2)  + con)), 
+        //           (int)(c[1] + g * 0.001 * (-1*0.00001*pow(c[0] - 127.5, 4) -0.0001*pow(c[0] - 127.5, 2)  + con)),
+        //           (int)(c[2] + b * 0.001 * (-1*0.00001*pow(c[0] - 127.5, 4) -0.0001*pow(c[0] - 127.5, 2)  + con))}; 
         // this is a smoother, quadratic fade compared to the linear, first line of this method
         //TODO make a switch for the fade mode to select fade type
         return f;
@@ -279,7 +280,7 @@ import cc.arduino.*;
         minim.stop();
         super.stop();
     }
-
+    
     class bar {
         float x, val;
         PVector scale;
