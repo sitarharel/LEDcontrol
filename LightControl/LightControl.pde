@@ -44,18 +44,15 @@ import cc.arduino.*;
 
     void settings() {
         size(1500, 800, P3D);
-        //fullScreen();
+        fullScreen();
     }
 
     void setup() {
         //frameRate(60);
         surface.setResizable(true);
         minim = new Minim(this);
-        
-        if (Arduino.list().length > 0) {
-              port = new Serial(this, "/dev/ttyUSB0", 57600);
-             //port = new Serial(this, Serial.list()[0], 57600);
-             
+        if (Arduino.list().length > 1) {
+             port = new Serial(this, Arduino.list()[1], 57600);
         } else {
             isarduino = false;
         }
@@ -84,7 +81,7 @@ import cc.arduino.*;
         bbar = new bar("blue", 200, new PVector(0, 255), 255);
 
         String[] p = {"music", "fade", "static"};
-        stat = new flip("state", (width - (p.length * 80)) / 2, 20, p, state);
+        stat = new flip("state", (width - 150 ) / 2, 50, p, state);
     }
 
     void draw() {
@@ -122,11 +119,11 @@ import cc.arduino.*;
 
         stat.draw(0, 0, 255);
         state = stat.val + 1;
-        if (!isarduino && Arduino.list().length > 0) {
-             port = new Serial(this, Serial.list()[0], 57600);
+        if (!isarduino && Arduino.list().length > 1) {
+             port = new Serial(this, Arduino.list()[1], 57600);
             isarduino = true;
         }
-        if (isarduino && Arduino.list().length == 0) {
+        if (isarduino && Arduino.list().length <= 1) {
             isarduino = false;
         }
 
@@ -286,8 +283,8 @@ import cc.arduino.*;
         float x, val;
         PVector scale;
         String name;
-        int w = 42;
-        int h = 16;
+        int w = 70; //42
+        int h = 20;
         float distwidth;
 
         bar(String n, float x, PVector scale, float def) {
@@ -303,14 +300,14 @@ import cc.arduino.*;
             color l = color(r * 0.5, g * 0.5, b * 0.5);
             fill(l);
             noStroke();
-            rect(x - 2, 0, 4, height);
+            rect(x - 2, 0, 4, height - 20);
             stroke(r, g, b);
             l = color(r * 0.7, g * 0.7, b * 0.7);
             fill(l);
             strokeWeight(2);
-            float y = height - height * (val - scale.x) / (scale.y - scale.x);
+            float y = height - 40 - (height - 60) * (val - scale.x) / (scale.y - scale.x);
             rect(x - w / 2, y - h / 2, w, h, 5, 5, 5, 5);
-            rect(x - (w * 1.5) / 2, height - h - 5, w * 1.5, h, 5, 5, 5, 5);
+            rect(x - w / 2, height - h - 5, w, h, 5, 5, 5, 5);
             fill(255);
             stroke(0);
             strokeWeight(1);
@@ -321,7 +318,7 @@ import cc.arduino.*;
 
         void update() {
             if (mousePressed && mouseX <= x + w / 2 && mouseX >= x - w / 2) {
-                val = (((float)height - mouseY) / ((float) height) * (scale.y - scale.x)) + scale.x;
+                val = 0 + (((float)height - 40 - mouseY) / ((float) height - 60) * (scale.y - scale.x)) + scale.x;
                 val = constrain(val, scale.x, scale.y);
             }
         }
@@ -332,8 +329,8 @@ import cc.arduino.*;
         int val;
         String[] options;
         String name;
-        int w = 80;
-        int h = 30;
+        int w = 120;
+        int h = 50;
 
         flip(String n, float x, float y, String[] options, int def) {
             this.x = x;
@@ -345,33 +342,33 @@ import cc.arduino.*;
 
         void draw(float r, float g, float b) {
             update();
-            x = width/2 - w * options.length * 0.5;
+            x = width/2 - w * 0.5;
             color l = color(r * 0.5, g * 0.5, b * 0.5);
             fill(l);
             //noFill();
             strokeWeight(2);
             if (val == 0) strokeWeight(4);
             stroke(r, g, b);
-            rect(x, y, w, h, 18, 0, 0, 18);
+            rect(x, y, w, h, 18, 18, 0, 0);
             for (int i = 1; i < options.length - 1; i++) {
                 strokeWeight(2);
                 if (val == i) strokeWeight(4);
-                rect(x + w * i, y, w, h, 0, 0, 0, 0);
+                rect(x, y + h * i, w, h, 0, 0, 0, 0);
             }
             strokeWeight(2);
             if (val == options.length - 1) strokeWeight(4);
-            rect(x + w * (options.length - 1), y, w, h, 0, 18, 18, 0);
+            rect(x, y + h * (options.length - 1), w, h, 0, 0, 18, 18);
             fill(255);
             textAlign(CENTER, CENTER);
             for (int i = 0; i < options.length; i++) {
-                text(options[i], x + w * i + w / 2, y + h / 2);
+                text(options[i], x + w / 2, y + h * i + h / 2);
             }
         }
 
         void update() {
             if (mousePressed) {
                 for (int i = 0; i < options.length; i++) {
-                    if (mouseX >= x + w * i && mouseX <= x + w * i + w && mouseY >= y && mouseY <= y + h) {
+                    if (mouseX >= x && mouseX <= x + w && mouseY >= y + h * i && mouseY <= y + h + h * i) {
                         val = i;
                     }
                 }
