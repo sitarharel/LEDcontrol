@@ -53,7 +53,8 @@ import cc.arduino.*;
         minim = new Minim(this);
         
         if (Arduino.list().length > 0) {
-             port = new Serial(this, Serial.list()[0], 57600);
+              port = new Serial(this, "/dev/ttyUSB0", 57600);
+             //port = new Serial(this, Serial.list()[0], 57600);
              
         } else {
             isarduino = false;
