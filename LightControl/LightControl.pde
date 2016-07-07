@@ -29,7 +29,9 @@ import cc.arduino.*;
     float[][] fftavgs = new float[3][100];
     int fahindex = -1;
     
-
+    boolean interOnOff = true;
+    boolean useConnection = true;
+    
     boolean isarduino = true;
     int fadetype;
     float dimness = 1; //scale of 0 to 1
@@ -87,6 +89,9 @@ import cc.arduino.*;
     void draw() {
 
         background(0);
+          if (frameCount % 30 == 0 && useConnection) {
+            thread("requestData");
+          }
         fft.forward(song.mix);
         if (state == 1) {
             musicVis();
@@ -229,6 +234,11 @@ import cc.arduino.*;
         r = constrain(r, 0, 255);
         g = constrain(g, 0, 255);
         b = constrain(b, 0, 255);
+        if(!interOnOff){
+         r = 0;
+         g = 0;
+         b = 0;
+        }
         fill(r, g, b);
         noStroke();
         rect(width / 2 - width / 6, 0, width / 3, height);
@@ -376,3 +386,9 @@ import cc.arduino.*;
         }
 
     }
+    
+// This happens as a separate thread and can take as long as it wants
+void requestData() {
+  String txt[] = loadStrings("http://192.241.154.171/lightstatus/");
+  interOnOff = txt[0].equals("ON");
+}
