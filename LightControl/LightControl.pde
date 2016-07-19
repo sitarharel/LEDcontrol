@@ -15,7 +15,6 @@ import cc.arduino.*;
     float osl = 0, osm = 0, osh = 0;
     int state = 1;
 
-    float kickSize, snareSize, hatSize;
     FFT fft;
     float[][] specs = new float[4][10];
     int index = 0;
@@ -29,7 +28,10 @@ import cc.arduino.*;
     float[][] fftavgs = new float[3][100];
     int fahindex = -1;
     
-
+    boolean interOnOff = true;
+    float[] interRGB = [0, 0, 0];
+    boolean useConnection = true;
+    
     boolean isarduino = true;
     int fadetype;
     float dimness = 1; //scale of 0 to 1
@@ -87,6 +89,9 @@ import cc.arduino.*;
     void draw() {
 
         background(0);
+          if (frameCount % 30 == 0 && useConnection) {
+            thread("requestData");
+          }
         fft.forward(song.mix);
         if (state == 1) {
             musicVis();
@@ -229,6 +234,11 @@ import cc.arduino.*;
         r = constrain(r, 0, 255);
         g = constrain(g, 0, 255);
         b = constrain(b, 0, 255);
+        if(interOnOff){
+         r = interRGB[0];
+         g = interRGB[1];
+         b = interRGB[2];
+        }
         fill(r, g, b);
         noStroke();
         rect(width / 2 - width / 6, 0, width / 3, height);
@@ -376,3 +386,14 @@ import cc.arduino.*;
         }
 
     }
+    
+// This happens as a separate thread and can take as long as it wants
+void requestData() {
+  String[] txt = loadStrings("http://192.241.154.171/lightstatus/");
+  interOnOff = txt[0].equals("ON");
+  String[] color = txt[1].split(",");
+
+  interRGB[0] = Float.parseFloat(color[0]);
+  interRGB[1] = Float.parseFloat(color[1]);
+  interRGB[2] = Float.parseFloat(color[2]);
+}
