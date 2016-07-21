@@ -11,3 +11,9 @@ This applet has 3 modes:
     Fades throughout different colors in ROYGBIV order.
   Static- 
     Select any RGB color and the lights will stay that color.
+
+To ssh into tablet: 
+  ssh sitar@[ip address] -m hmac-md5
+
+To run the app from the command line: 
+  C:\processing-3.1.1\processing-java.exe --sketch="C:\Users\Sitar\Documents\LEDcontrol\LightControl" --run
