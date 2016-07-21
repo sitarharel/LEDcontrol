@@ -391,9 +391,9 @@ import cc.arduino.*;
 void requestData() {
   String[] txt = loadStrings("http://192.241.154.171/lightstatus/");
   interOnOff = txt[0].equals("ON");
-  String[] color = txt[1].split(",");
+  String[] c = txt[1].split(",");
 
-  interRGB[0] = Integer.parseInt(color[0]);
-  interRGB[1] = Integer.parseInt(color[1]);
-  interRGB[2] = Integer.parseInt(color[2]);
+  interRGB[0] = Integer.parseInt(c[0]);
+  interRGB[1] = Integer.parseInt(c[1]);
+  interRGB[2] = Integer.parseInt(c[2]);
 }
