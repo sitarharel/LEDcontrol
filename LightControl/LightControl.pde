@@ -29,7 +29,7 @@ import cc.arduino.*;
     int fahindex = -1;
     
     boolean interOnOff = true;
-    float[] interRGB = [0, 0, 0];
+    int[] interRGB = {0, 0, 0};
     boolean useConnection = true;
     
     boolean isarduino = true;
@@ -393,7 +393,7 @@ void requestData() {
   interOnOff = txt[0].equals("ON");
   String[] color = txt[1].split(",");
 
-  interRGB[0] = Float.parseFloat(color[0]);
-  interRGB[1] = Float.parseFloat(color[1]);
-  interRGB[2] = Float.parseFloat(color[2]);
+  interRGB[0] = Integer.parseInt(color[0]);
+  interRGB[1] = Integer.parseInt(color[1]);
+  interRGB[2] = Integer.parseInt(color[2]);
 }
