@@ -52,9 +52,9 @@ void settings() {
 
 void setup() {
 		//frameRate(60);
-	webstatic.setString("r", "180");
-	webstatic.setString("g", "0");
-	webstatic.setString("b", "50");
+	webstatic.setInt("r", 180);
+	webstatic.setInt("g", 0);
+	webstatic.setInt("b", 50);
 
 	surface.setResizable(true);
 	minim = new Minim(this);
@@ -287,9 +287,9 @@ void outputToArduino(int r, int g, int b){
 
 int[] webcontrolResult() {
 	int[] res = new int[3];
-	res[0] = json.getInt("r");
-	res[1] = json.getInt("g");
-	res[2] = json.getInt("b");
+	res[0] = webstatic.getInt("r");
+	res[1] = webstatic.getInt("g");
+	res[2] = webstatic.getInt("b");
 	return res;
 }
 
@@ -419,7 +419,7 @@ void requestData() {
 	// {webcontrol: false, lightmode: "static", music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
 
 	JSONObject json = loadJSONObject("http://sitarbucks.com/lightstatus/");
-	webstatic = json.getJSONObject("static");
+	z = json.getJSONObject("static");
 	webcontrol = json.getBoolean("webcontrol");
 
 	// String[] txt = loadStrings("http://192.241.154.171/lightstatus/");
