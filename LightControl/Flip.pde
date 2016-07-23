@@ -1,4 +1,3 @@
-
 class Flip {
     float x, y;
     int val;
