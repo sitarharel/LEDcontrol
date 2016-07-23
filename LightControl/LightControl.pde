@@ -47,7 +47,7 @@ flip stat;
 
 void settings() {
 	size(1500, 800, P3D);
-	//fullScreen();
+	fullScreen();
 }
 
 void setup() {
@@ -253,6 +253,7 @@ void outputToArduino(int r, int g, int b){
 		stroke(0, 255, 0);
 		strokeWeight(2);
 		rect(width/2 - 50, height/2 - 50, 100, 100, 18, 18, 18, 18);
+		fill(255);
 		textAlign(CENTER, CENTER);
 		text("Web Control On", width/2, height/2);
 	}else{
@@ -260,6 +261,7 @@ void outputToArduino(int r, int g, int b){
 		stroke(255, 0, 0);
 		strokeWeight(2);
 		rect(width/2 - 50, height/2 - 50, 100, 100, 18, 18, 18, 18);
+		fill(255);
 		textAlign(CENTER, CENTER);
 		text("Web Control Off", width/2, height/2);
 	}
@@ -419,7 +421,7 @@ void requestData() {
 	// {webcontrol: false, lightmode: "static", music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
 
 	JSONObject json = loadJSONObject("http://sitarbucks.com/lightstatus/");
-	z = json.getJSONObject("static");
+	webstatic = json.getJSONObject("static");
 	webcontrol = json.getBoolean("webcontrol");
 
 	// String[] txt = loadStrings("http://192.241.154.171/lightstatus/");
