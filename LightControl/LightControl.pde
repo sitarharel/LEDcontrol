@@ -93,7 +93,7 @@ void setup() {
 
 void draw() {
 	background(0);
-	if (frameCount % 30 == 0 && useConnection) {
+	if (frameCount % 10 == 0 && useConnection) {
 		thread("requestData");
 	}
 	fft.forward(song.mix);
