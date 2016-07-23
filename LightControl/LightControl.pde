@@ -8,11 +8,6 @@ AudioInput song;
 Arduino arduino;
 Serial port;
 
-int GREEN = 3;
-int RED = 6;
-int BLUE = 9;
-
-float osl = 0, osm = 0, osh = 0;
 int state = 1;
 
 FFT fft;
@@ -42,12 +37,12 @@ float maxvel = 0.3;
 float ref = 1.15;
 int avgamount = 15;
 int fdelay = 12;
-bar rbar, gbar, bbar, power, dim, white, refresh, maxv, fadespeed, smooth;
-flip stat;
+Bar rbar, gbar, bbar, power, dim, white, refresh, maxv, fadespeed, smooth;
+Flip stat;
 
 void settings() {
 	size(1500, 800, P3D);
-	fullScreen();
+	// fullScreen();
 }
 
 void setup() {
@@ -59,7 +54,7 @@ void setup() {
 	surface.setResizable(true);
 	minim = new Minim(this);
 	if (Arduino.list().length > 1) {
-		port = new Serial(this, Arduino.list()[1], 57600);
+		// port = new Serial(this, Arduino.list()[1], 57600);
 	} else {
 		isarduino = false;
 	}
@@ -75,20 +70,20 @@ void setup() {
 		}
 	}
 
-	power = new bar("contrast", 200, new PVector(0, 5), powV);
-	dim = new bar("intensity", 125, new PVector(0, 1), dimness);
-	white = new bar("white", 50, new PVector(0, 1), partswhite);
-	refresh = new bar("refresh", 350, new PVector(0, 3), ref);
-	maxv = new bar("max", 275, new PVector(0, 1), maxvel);
-	fadespeed = new bar("speed", 200, new PVector(0, 100), fdelay);
-	smooth = new bar("smooth", 425, new PVector(1, 100), avgamount);
+	power = new Bar("contrast", 200, new PVector(0, 5), powV);
+	dim = new Bar("intensity", 125, new PVector(0, 1), dimness);
+	white = new Bar("white", 50, new PVector(0, 1), partswhite);
+	refresh = new Bar("refresh", 350, new PVector(0, 3), ref);
+	maxv = new Bar("max", 275, new PVector(0, 1), maxvel);
+	fadespeed = new Bar("speed", 200, new PVector(0, 100), fdelay);
+	smooth = new Bar("smooth", 425, new PVector(1, 100), avgamount);
 
-	rbar = new bar("red", 350, new PVector(0, 255), 255);
-	gbar = new bar("green", 275, new PVector(0, 255), 255);
-	bbar = new bar("blue", 200, new PVector(0, 255), 255);
+	rbar = new Bar("red", 350, new PVector(0, 255), 255);
+	gbar = new Bar("green", 275, new PVector(0, 255), 255);
+	bbar = new Bar("blue", 200, new PVector(0, 255), 255);
 
 	String[] p = {"music", "fade", "static"};
-	stat = new flip("state", (width - 150 ) / 2, 50, p, state);
+	stat = new Flip("state", (width - 150 ) / 2, 50, p, state);
 }
 
 void draw() {
@@ -218,7 +213,7 @@ void musicVis() {
 }
 
 void fadeCoded(int d) {
-		//int[][] f = {{1, -1, 0},{-1, 0, 1},{1, 1, -1},{-1, -1, 1},{0, 1, -1},{1, -1, 1},{-1, 1, -1}};
+	//int[][] f = {{1, -1, 0},{-1, 0, 1},{1, 1, -1},{-1, -1, 1},{0, 1, -1},{1, -1, 1},{-1, 1, -1}};
 	int[][] f = {{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}, {0, -1, 0}, {1, 0, 0}, {0, 0, -1}};
 	currentfade = getNextFade(currentfade, f[fadenum][0], f[fadenum][1], f[fadenum][2]);
 	int rq = (int) (constrain(currentfade[0], 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
@@ -276,9 +271,6 @@ void outputToArduino(int r, int g, int b){
 	rect(2 * width/9, height - (b * height/255) - 5, width / 9, 10, 5, 5, 5, 5);
 	int allowedchange = 1;
 	if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
-			//arduino.analogWrite(RED, r);
-			//arduino.analogWrite(GREEN, g);
-			//arduino.analogWrite(BLUE, b);
 		byte[] send = {(byte)(r - 128), (byte)(g - 128), (byte)(b - 128)};
 		port.write(send);
 
@@ -319,102 +311,6 @@ void stop() {
 	super.stop();
 }
 
-class bar {
-	float x, val;
-	PVector scale;
-	String name;
-	int w = 70; //42
-	int h = 20;
-	float distwidth;
-
-	bar(String n, float x, PVector scale, float def) {
-		this.distwidth = x;
-		this.scale = scale;
-		val = def;
-		name = n;
-	}
-
-	void draw(float r, float g, float b) {
-		update();
-		x = width - distwidth;
-		color l = color(r * 0.5, g * 0.5, b * 0.5);
-		fill(l);
-		noStroke();
-		rect(x - 2, 0, 4, height - 20);
-		stroke(r, g, b);
-		l = color(r * 0.7, g * 0.7, b * 0.7);
-		fill(l);
-		strokeWeight(2);
-		float y = height - 40 - (height - 60) * (val - scale.x) / (scale.y - scale.x);
-		rect(x - w / 2, y - h / 2, w, h, 5, 5, 5, 5);
-		rect(x - w / 2, height - h - 5, w, h, 5, 5, 5, 5);
-		fill(255);
-		stroke(0);
-		strokeWeight(1);
-		textAlign(CENTER, CENTER);
-		text(val, x, y);
-		text(name, x, height - 7 - h / 2);
-	}
-
-	void update() {
-		if (mousePressed && mouseX <= x + w / 2 && mouseX >= x - w / 2) {
-			val = 0 + (((float)height - 40 - mouseY) / ((float) height - 60) * (scale.y - scale.x)) + scale.x;
-			val = constrain(val, scale.x, scale.y);
-		}
-	}
-}
-
-class flip {
-	float x, y;
-	int val;
-	String[] options;
-	String name;
-	int w = 120;
-	int h = 50;
-
-	flip(String n, float x, float y, String[] options, int def) {
-		this.x = x;
-		this.y = y;
-		this.options = options;
-		val = def;
-		name = n;
-	}
-
-	void draw(float r, float g, float b) {
-		update();
-		x = width/2 - w * 0.5;
-		color l = color(r * 0.5, g * 0.5, b * 0.5);
-		fill(l);
-		//noFill();
-		strokeWeight(2);
-		if (val == 0) strokeWeight(4);
-		stroke(r, g, b);
-		rect(x, y, w, h, 18, 18, 0, 0);
-		for (int i = 1; i < options.length - 1; i++) {
-			strokeWeight(2);
-			if (val == i) strokeWeight(4);
-			rect(x, y + h * i, w, h, 0, 0, 0, 0);
-		}
-		strokeWeight(2);
-		if (val == options.length - 1) strokeWeight(4);
-		rect(x, y + h * (options.length - 1), w, h, 0, 0, 18, 18);
-		fill(255);
-		textAlign(CENTER, CENTER);
-		for (int i = 0; i < options.length; i++) {
-			text(options[i], x + w / 2, y + h * i + h / 2);
-		}
-	}
-
-	void update() {
-		if (mousePressed) {
-			for (int i = 0; i < options.length; i++) {
-				if (mouseX >= x && mouseX <= x + w && mouseY >= y + h * i && mouseY <= y + h + h * i) {
-					val = i;
-				}
-			}
-		}
-	}
-}
 
 // This happens as a separate thread and can take as long as it wants
 void requestData() {
