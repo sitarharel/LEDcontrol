@@ -47,10 +47,6 @@ class MusicControl {
         return ret;
     }
 
-    void update() {
-
-    }
-
     void drawAvg(int detail, float specpercent, boolean push) {
         stroke(0, 0, 255, 200);
         fill(0, 0, 255, 18);
