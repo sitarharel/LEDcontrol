@@ -287,9 +287,9 @@ void outputToArduino(int r, int g, int b){
 
 int[] webcontrolResult() {
 	int[] res = new int[3];
-	res[0] = Integer.parseInt(webstatic.getString("r"));
-	res[1] = Integer.parseInt(webstatic.getString("g"));
-	res[2] = Integer.parseInt(webstatic.getString("b"));
+	res[0] = getInt("r");
+	res[1] = getInt("g");
+	res[2] = getInt("b");
 	return res;
 }
 
@@ -419,8 +419,8 @@ void requestData() {
 	// {webcontrol: false, lightmode: "static", music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
 
 	JSONObject json = loadJSONObject("http://sitarbucks.com/lightstatus/");
-	webstatic = parseJSONObject(json.getString("static"));
-	webcontrol = json.getString("static").equals("true");
+	webstatic = json.getJSONObject("static");
+	webcontrol = json.getBoolean("webcontrol");
 
 	// String[] txt = loadStrings("http://192.241.154.171/lightstatus/");
 	// interOnOff = txt[0].equals("ON");
