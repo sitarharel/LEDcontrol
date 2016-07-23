@@ -287,9 +287,9 @@ void outputToArduino(int r, int g, int b){
 
 int[] webcontrolResult() {
 	int[] res = new int[3];
-	res[0] = getInt("r");
-	res[1] = getInt("g");
-	res[2] = getInt("b");
+	res[0] = json.getInt("r");
+	res[1] = json.getInt("g");
+	res[2] = json.getInt("b");
 	return res;
 }
 
