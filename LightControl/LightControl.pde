@@ -27,7 +27,7 @@ Toggle webconn;
 
 void settings() {
 	size(1500, 800, P3D);
-	// fullScreen();
+	fullScreen();
 }
 
 void setup() {
@@ -37,11 +37,11 @@ void setup() {
 
 	surface.setResizable(true);
 
-	// if (Arduino.list().length > 1) {
-	// 	port = new Serial(this, Arduino.list()[1], 57600);
-	// } else {
-	// 	isarduino = false;
-	// }
+	if (Arduino.list().length > 1) {
+		port = new Serial(this, Arduino.list()[1], 57600);
+	} else {
+		isarduino = false;
+	}
 
 	mc = new MusicControl();
 	fc = new FadeControl();
@@ -96,13 +96,13 @@ void draw() {
 	stat.draw(0, 0, 255);
 	state = stat.val + 1;
 
-	// if (!isarduino && Arduino.list().length > 1) {
-	// 	port = new Serial(this, Arduino.list()[1], 57600);
-	// 	isarduino = true;
-	// }
-	// if (isarduino && Arduino.list().length <= 1) {
-	// 	isarduino = false;
-	// }
+	if (!isarduino && Arduino.list().length > 1) {
+		port = new Serial(this, Arduino.list()[1], 57600);
+		isarduino = true;
+	}
+	if (isarduino && Arduino.list().length <= 1) {
+		isarduino = false;
+	}
 }
 
 void outputToArduino(int r, int g, int b){
@@ -115,8 +115,6 @@ void outputToArduino(int r, int g, int b){
 	rect(width / 2 - width / 6, 0, width / 3, height);
 	strokeWeight(3);
 
-	// drawWebcontrolStat();
-
 	fill(200, 0, 0);
 	stroke(255, 0, 0);
 	rect(0, height - (r * height/255) - 5, width / 9, 10, 5, 5, 5, 5);
@@ -128,12 +126,12 @@ void outputToArduino(int r, int g, int b){
 	rect(2 * width/9, height - (b * height/255) - 5, width / 9, 10, 5, 5, 5, 5);
 	int allowedchange = 1;
 
-	// if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
-	// 	byte[] send = {(byte)(r - 128), (byte)(g - 128), (byte)(b - 128)};
-	// 	port.write(send);
-	// 	int[] nw = {r, g, b};
-	// 	oldRGBoutput = nw;
-	// }
+	if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
+		byte[] send = {(byte)(r - 128), (byte)(g - 128), (byte)(b - 128)};
+		port.write(send);
+		int[] nw = {r, g, b};
+		oldRGBoutput = nw;
+	}
 }
 
 void makePost(){
