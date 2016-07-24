@@ -1,6 +1,8 @@
 import processing.serial.*;
 import cc.arduino.*;
 
+import http.requests.*;
+
 Arduino arduino;
 Serial port;
 
@@ -21,10 +23,11 @@ Bar rbar, gbar, bbar, dim, white, fadespeed;
 Flip stat;
 MusicControl mc;
 FadeControl fc;
+Toggle webconn;
 
 void settings() {
 	size(1500, 800, P3D);
-	fullScreen();
+	// fullScreen();
 }
 
 void setup() {
@@ -34,11 +37,11 @@ void setup() {
 
 	surface.setResizable(true);
 
-	if (Arduino.list().length > 1) {
-		port = new Serial(this, Arduino.list()[1], 57600);
-	} else {
-		isarduino = false;
-	}
+	// if (Arduino.list().length > 1) {
+	// 	port = new Serial(this, Arduino.list()[1], 57600);
+	// } else {
+	// 	isarduino = false;
+	// }
 
 	mc = new MusicControl();
 	fc = new FadeControl();
@@ -52,6 +55,8 @@ void setup() {
 
 	String[] p = {"music", "fade", "static"};
 	stat = new Flip("state", (width - 150 ) / 2, 50, p, state);
+	String[] ops = {"Web control on", "Web control off"};
+	webconn = new Toggle(width/2, height/2, 100, 100, ops, true);
 }
 
 void draw() {
@@ -80,6 +85,9 @@ void draw() {
 	}
 	outputToArduino(output[0], output[1], output[2]);
 
+	webconn.setSelected(webcontrol);	
+	webconn.draw(true);
+	
 	white.draw(255, 255, 255);
 	partswhite = white.val;
 	dim.draw(255, 0, 255);
@@ -88,13 +96,13 @@ void draw() {
 	stat.draw(0, 0, 255);
 	state = stat.val + 1;
 
-	if (!isarduino && Arduino.list().length > 1) {
-		port = new Serial(this, Arduino.list()[1], 57600);
-		isarduino = true;
-	}
-	if (isarduino && Arduino.list().length <= 1) {
-		isarduino = false;
-	}
+	// if (!isarduino && Arduino.list().length > 1) {
+	// 	port = new Serial(this, Arduino.list()[1], 57600);
+	// 	isarduino = true;
+	// }
+	// if (isarduino && Arduino.list().length <= 1) {
+	// 	isarduino = false;
+	// }
 }
 
 void outputToArduino(int r, int g, int b){
@@ -107,7 +115,7 @@ void outputToArduino(int r, int g, int b){
 	rect(width / 2 - width / 6, 0, width / 3, height);
 	strokeWeight(3);
 
-	drawWebcontrolStat();
+	// drawWebcontrolStat();
 
 	fill(200, 0, 0);
 	stroke(255, 0, 0);
@@ -120,32 +128,19 @@ void outputToArduino(int r, int g, int b){
 	rect(2 * width/9, height - (b * height/255) - 5, width / 9, 10, 5, 5, 5, 5);
 	int allowedchange = 1;
 
-	if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
-		byte[] send = {(byte)(r - 128), (byte)(g - 128), (byte)(b - 128)};
-		port.write(send);
-		int[] nw = {r, g, b};
-		oldRGBoutput = nw;
-	}
+	// if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
+	// 	byte[] send = {(byte)(r - 128), (byte)(g - 128), (byte)(b - 128)};
+	// 	port.write(send);
+	// 	int[] nw = {r, g, b};
+	// 	oldRGBoutput = nw;
+	// }
 }
 
-void drawWebcontrolStat(){
-	if(webcontrol){
-		fill(0, 200, 0);
-		stroke(0, 255, 0);
-		strokeWeight(2);
-		rect(width/2 - 50, height/2 - 50, 100, 100, 18, 18, 18, 18);
-		fill(255);
-		textAlign(CENTER, CENTER);
-		text("Web Control On", width/2, height/2);
-	}else{
-		fill(200, 0, 0);
-		stroke(255, 0, 0);
-		strokeWeight(2);
-		rect(width/2 - 50, height/2 - 50, 100, 100, 18, 18, 18, 18);
-		fill(255);
-		textAlign(CENTER, CENTER);
-		text("Web Control Off", width/2, height/2);
-	}
+void makePost(){
+	String s = webconn.selected ? "true" : "false";
+	PostRequest post = new PostRequest("http://sitarbucks.com/lightstatus/");
+	post.addData("lightstat", s);
+	post.send();
 }
 
 int[] webcontrolResult() {
