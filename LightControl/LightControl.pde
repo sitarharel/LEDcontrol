@@ -12,6 +12,7 @@ boolean webcontrol = false;
 int[] interRGB = {0, 0, 0};
 boolean useConnection = true;
 JSONObject webstatic = new JSONObject();
+int webstate = 3;
 
 int[] oldRGBoutput = {0, 0, 0};
 
@@ -61,10 +62,25 @@ void setup() {
 
 void draw() {
 	background(0);
-	if (frameCount % 10 == 0 && useConnection) {
+	if (frameCount % 3 == 0 && useConnection) {
 		thread("requestData");
 	}
 	int[] output = new int[3];
+	// int select = webcontrol ? webstate : state;
+	if(webcontrol){
+		stat.val = webstate - 1; 
+		rbar.val = res[0];
+		rbar.val = res[1];
+	}
+
+	white.draw(255, 255, 255);
+	partswhite = white.val;
+	dim.draw(255, 0, 255);
+	dimness = dim.val;
+
+	stat.draw(0, 0, 255);
+	state = stat.val + 1;
+
 	if (state == 1) {
 		int[] musicval = mc.doMusicControl();
 		output = musicval;
@@ -72,6 +88,12 @@ void draw() {
 		int[] fadeval = fc.doFadeControl();
 		output = fadeval;
 	} else if (state == 3) {
+		if(webcontrol){
+			int[] res = webcontrolResult();
+			rbar.val = res[2];
+			gbar.val = res[3];
+			bbar.val = res[4];
+		}
 		output[0] = (int) (constrain(rbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[1] = (int) (constrain(gbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[2] = (int) (constrain(bbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
@@ -80,21 +102,14 @@ void draw() {
 		bbar.draw(0, 0, 255);
 	}
 
-	if(webcontrol){
-		output = webcontrolResult();
-	}
+	// if(webcontrol){
+	// 	output = webcontrolResult();
+	// }
 	outputToArduino(output[0], output[1], output[2]);
 
 	webconn.setSelected(webcontrol);	
 	webconn.draw(true);
-	
-	white.draw(255, 255, 255);
-	partswhite = white.val;
-	dim.draw(255, 0, 255);
-	dimness = dim.val;
 
-	stat.draw(0, 0, 255);
-	state = stat.val + 1;
 
 	if (!isarduino && Arduino.list().length > 1) {
 		port = new Serial(this, Arduino.list()[1], 57600);
@@ -142,7 +157,7 @@ void makePost(){
 }
 
 int[] webcontrolResult() {
-	int[] res = {webstatic.getInt("r"), webstatic.getInt("g"), webstatic.getInt("b")};
+	int[] res = {webstatic.getInt("dim"), webstatic.getInt("white"), webstatic.getInt("r"), webstatic.getInt("g"), webstatic.getInt("b")};
 	return res;
 }
 
@@ -156,5 +171,6 @@ void requestData() {
 	// {webcontrol: false, lightmode: "static", music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
 	JSONObject json = loadJSONObject("http://sitarbucks.com/lightstatus/");
 	webstatic = json.getJSONObject("static");
+
 	webcontrol = json.getBoolean("webcontrol");
 }
