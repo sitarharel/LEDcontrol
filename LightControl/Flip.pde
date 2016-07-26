@@ -48,8 +48,8 @@ class Flip {
             }
         }
     }
-    
-    void setVal(float v){
+
+    void setVal(int v){
         this.val = v;
     }
 }

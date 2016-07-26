@@ -35,6 +35,8 @@ void setup() {
 	webstatic.setInt("r", 180);
 	webstatic.setInt("g", 0);
 	webstatic.setInt("b", 50);
+	webstatic.setInt("dim", 1);
+	webstatic.setInt("white", 0);
 
 	surface.setResizable(true);
 
@@ -69,17 +71,14 @@ void draw() {
 	// int select = webcontrol ? webstate : state;
 	int[] res = webcontrolResult();
 	if(webcontrol){
-		stat.setVal((float) (webstate - 1)); 
+		stat.setVal(webstate - 1); 
 		dim.setVal((float) res[0]);
 		white.setVal((float) res[1]);
 	}
 
-	white.draw(255, 255, 255);
 	partswhite = white.val;
-	dim.draw(255, 0, 255);
 	dimness = dim.val;
 
-	stat.draw(0, 0, 255);
 	state = stat.val + 1;
 
 	if (state == 1) {
@@ -90,9 +89,9 @@ void draw() {
 		output = fadeval;
 	} else if (state == 3) {
 		if(webcontrol){
-			rbar.val = setVal((float) res[2]);
-			gbar.val = setVal((float) res[3]);
-			bbar.val = setVal((float) res[4]);
+			rbar.setVal((float) res[2]);
+			gbar.setVal((float) res[3]);
+			bbar.setVal((float) res[4]);
 		}
 		output[0] = (int) (constrain(rbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[1] = (int) (constrain(gbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
@@ -107,6 +106,9 @@ void draw() {
 	// }
 	outputToArduino(output[0], output[1], output[2]);
 
+	white.draw(255, 255, 255);
+	dim.draw(255, 0, 255);
+	stat.draw(0, 0, 255);
 	webconn.setSelected(webcontrol);	
 	webconn.draw(true);
 
