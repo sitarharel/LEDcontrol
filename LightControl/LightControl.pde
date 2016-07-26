@@ -67,8 +67,9 @@ void draw() {
 	}
 	int[] output = new int[3];
 	// int select = webcontrol ? webstate : state;
+	int[] res = webcontrolResult();
 	if(webcontrol){
-		stat.val = webstate - 1; 
+		stat.val = webstate; 
 		rbar.val = res[0];
 		rbar.val = res[1];
 	}
@@ -89,7 +90,6 @@ void draw() {
 		output = fadeval;
 	} else if (state == 3) {
 		if(webcontrol){
-			int[] res = webcontrolResult();
 			rbar.val = res[2];
 			gbar.val = res[3];
 			bbar.val = res[4];
