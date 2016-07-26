@@ -41,4 +41,8 @@ class Bar {
             val = constrain(val, scale.x, scale.y);
         }
     }
+
+    void setVal(float v){
+        this.val = v;
+    }
 }

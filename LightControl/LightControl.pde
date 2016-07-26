@@ -69,9 +69,9 @@ void draw() {
 	// int select = webcontrol ? webstate : state;
 	int[] res = webcontrolResult();
 	if(webcontrol){
-		stat.val = webstate; 
-		rbar.val = res[0];
-		rbar.val = res[1];
+		stat.setVal((float) (webstate - 1)); 
+		dim.setVal((float) res[0]);
+		white.setVal((float) res[1]);
 	}
 
 	white.draw(255, 255, 255);
@@ -90,9 +90,9 @@ void draw() {
 		output = fadeval;
 	} else if (state == 3) {
 		if(webcontrol){
-			rbar.val = res[2];
-			gbar.val = res[3];
-			bbar.val = res[4];
+			rbar.val = setVal((float) res[2]);
+			gbar.val = setVal((float) res[3]);
+			bbar.val = setVal((float) res[4]);
 		}
 		output[0] = (int) (constrain(rbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[1] = (int) (constrain(gbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
