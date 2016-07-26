@@ -35,8 +35,8 @@ void setup() {
 	webstatic.setInt("r", 180);
 	webstatic.setInt("g", 0);
 	webstatic.setInt("b", 50);
-	webstatic.setInt("dim", 1);
-	webstatic.setInt("white", 0);
+	webstatic.setFloat("dim", 1.0);
+	webstatic.setFloat("white", 0.0);
 
 	surface.setResizable(true);
 
@@ -69,11 +69,10 @@ void draw() {
 	}
 	int[] output = new int[3];
 	// int select = webcontrol ? webstate : state;
-	int[] res = webcontrolResult();
 	if(webcontrol){
 		stat.setVal(webstate - 1); 
-		dim.setVal((float) res[0]);
-		white.setVal((float) res[1]);
+		dim.setVal(webstatic.getFloat("dim"));
+		white.setVal(webstatic.getFloat("white"));
 	}
 
 	partswhite = white.val;
@@ -89,9 +88,10 @@ void draw() {
 		output = fadeval;
 	} else if (state == 3) {
 		if(webcontrol){
-			rbar.setVal((float) res[2]);
-			gbar.setVal((float) res[3]);
-			bbar.setVal((float) res[4]);
+			int[] res = webcontrolResult();
+			rbar.setVal((float) res[0]);
+			gbar.setVal((float) res[1]);
+			bbar.setVal((float) res[2]);
 		}
 		output[0] = (int) (constrain(rbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[1] = (int) (constrain(gbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
@@ -159,7 +159,7 @@ void makePost(){
 }
 
 int[] webcontrolResult() {
-	int[] res = {webstatic.getInt("dim"), webstatic.getInt("white"), webstatic.getInt("r"), webstatic.getInt("g"), webstatic.getInt("b")};
+	int[] res = {webstatic.getInt("r"), webstatic.getInt("g"), webstatic.getInt("b")};
 	return res;
 }
 
