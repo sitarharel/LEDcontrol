@@ -29,4 +29,5 @@ void loop() {
       analogWrite(GREEN, input[1] + 128);
       analogWrite(BLUE, input[2] + 128);
     }
+  }
 }
