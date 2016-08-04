@@ -1,3 +1,4 @@
+
 const int RED = 6;
 const int GREEN = 3;
 const int BLUE = 9;
@@ -16,11 +17,17 @@ void loop() {
 
   // check if data has been sent from the computer:
   if (Serial.available()) {
-      // read the most recent byte (which will be from 0 to 255):
+      // read the most recent byte (which will be from -128 to 127):
     Serial.readBytes(input, 3);
-    // set the brightness of the LED:
-    analogWrite(RED, input[0] + 128);
-    analogWrite(GREEN, input[1] + 128);
-    analogWrite(BLUE, input[2] + 128);
-  }
+    // set the brightness of the LEDs:
+    int offThreshold = -128;
+    if(input[0] <= offThreshold && input[1] <= offThreshold && input[2] <= offThreshold){
+      analogWrite(RED, 0);
+      analogWrite(GREEN, 0);
+      analogWrite(BLUE, 0);
+    }else{
+      analogWrite(RED, input[0] + 128);
+      analogWrite(GREEN, input[1] + 128);
+      analogWrite(BLUE, input[2] + 128);
+    }
 }
