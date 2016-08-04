@@ -13,7 +13,11 @@ This applet has 3 modes:
     Select any RGB color and the lights will stay that color.
 
 To ssh into tablet: 
+```
   ssh sitar@[ip address] -m hmac-md5
+```
 
 To run the app from the command line: 
-  C:\processing-3.1.1\processing-java.exe --sketch="C:\Users\Sitar\Documents\LEDcontrol\LightControl" --run
+```
+  <path to processing>\processing-3.1.1\processing-java.exe --sketch="<path to repo>\LEDcontrol\LightControl" --run
+```
