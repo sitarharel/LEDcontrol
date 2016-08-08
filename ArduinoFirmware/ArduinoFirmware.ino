@@ -57,5 +57,9 @@ void loop() {
     //  Serial.print(b);
     //  Serial.print(" old b: ");
     //  Serial.println(oldB);
-    }
+}else{
+    analogWrite(RED, 20);
+    analogWrite(GREEN, 20);
+    analogWrite(BLUE, 20);
+}
 }
