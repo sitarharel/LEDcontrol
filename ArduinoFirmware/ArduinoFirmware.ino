@@ -1,9 +1,9 @@
 const int RED = 6;
 const int GREEN = 3;
 const int BLUE = 9;
-int oldR = 0;
-int oldG = 0;
-int oldB = 0;
+int oldR;
+int oldG;
+int oldB;
 
 
 void setup() {
@@ -13,6 +13,9 @@ void setup() {
   pinMode(RED, OUTPUT);
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
+  oldR = 0;
+  oldG = 0;
+  oldB = 0;
 }
 
 void loop() {
@@ -35,7 +38,7 @@ void loop() {
         oldG = g;
         oldB = b;
     }else{
-        analogWrite(RED, 0);
+        analogWrite(RED, 250);
         analogWrite(GREEN, 0);
         analogWrite(BLUE, 0);
     }
