@@ -51,7 +51,7 @@ void setup() {
 
 	white = new Bar("white", 50, new PVector(0, 1), partswhite);
 	dim = new Bar("intensity", 125, new PVector(0, 1), dimness);
-	
+
 	rbar = new Bar("red", 350, new PVector(0, 255), 255);
 	gbar = new Bar("green", 275, new PVector(0, 255), 255);
 	bbar = new Bar("blue", 200, new PVector(0, 255), 255);
@@ -70,7 +70,7 @@ void draw() {
 	int[] output = new int[3];
 	// int select = webcontrol ? webstate : state;
 	if(webcontrol){
-		stat.setVal(webstate - 1); 
+		stat.setVal(webstate - 1);
 		dim.setVal(webstatic.getFloat("dim"));
 		white.setVal(webstatic.getFloat("white"));
 	}
@@ -109,7 +109,7 @@ void draw() {
 	white.draw(255, 255, 255);
 	dim.draw(255, 0, 255);
 	stat.draw(0, 0, 255);
-	webconn.setSelected(webcontrol);	
+	webconn.setSelected(webcontrol);
 	webconn.draw(true);
 
 
@@ -143,7 +143,7 @@ void outputToArduino(int r, int g, int b){
 	rect(2 * width/9, height - (b * height/255) - 5, width / 9, 10, 5, 5, 5, 5);
 	int allowedchange = 1;
 
-	if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
+	if(isarduino){
 		byte[] send = {(byte)(r - 128), (byte)(g - 128), (byte)(b - 128)};
 		port.write(send);
 		int[] nw = {r, g, b};
