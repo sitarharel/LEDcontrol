@@ -27,7 +27,7 @@ void loop() {
     Serial.readBytes((char*) input, 3);
     // set the brightness of the LEDs:
     int offThreshold = 0;
-    int changeThreshold = 2;
+    int changeThreshold = 1;
     int r = ((int) input[0]) + 128;
     int g = ((int) input[1]) + 128;
     int b = ((int) input[2]) + 128;
@@ -43,22 +43,22 @@ void loop() {
         oldR = r;
         oldG = g;
         oldB = b;
-    }else{
-        analogWrite(RED, 0);
-        analogWrite(GREEN, 0);
-        analogWrite(BLUE, 0);
+    // }else{
+        // analogWrite(RED, 0);
+        // analogWrite(GREEN, 0);
+        // analogWrite(BLUE, 0);
     }
-    Serial.print("r: ");
-     Serial.print(r);
-     Serial.print(" old r: ");
-     Serial.println(oldR);
-    Serial.print("g: ");
-     Serial.print(g);
-     Serial.print(" old g: ");
-     Serial.println(oldG);
-    Serial.print("b: ");
-     Serial.print(b);
-     Serial.print(" old b: ");
-     Serial.println(oldB);
+    // Serial.print("r: ");
+    //  Serial.print(r);
+    //  Serial.print(" old r: ");
+    //  Serial.println(oldR);
+    // Serial.print("g: ");
+    //  Serial.print(g);
+    //  Serial.print(" old g: ");
+    //  Serial.println(oldG);
+    // Serial.print("b: ");
+    //  Serial.print(b);
+    //  Serial.print(" old b: ");
+    //  Serial.println(oldB);
   }
 }
