@@ -48,8 +48,17 @@ void loop() {
         analogWrite(GREEN, 0);
         analogWrite(BLUE, 0);
     }
-    serial.print("\n r: " + r + " old r: " + oldR);
-    serial.print("\n g: " + g + " old g: " + oldG);
-    serial.print("\n b: " + b + " old b: " + oldB);
+    Serial.print("r: ");
+     Serial.print(r);
+     Serial.print(" old r: ");
+     Serial.println(oldR);
+    Serial.print("g: ");
+     Serial.print(g);
+     Serial.print(" old g: ");
+     Serial.println(oldG);
+    Serial.print("b: ");
+     Serial.print(b);
+     Serial.print(" old b: ");
+     Serial.println(oldB);
   }
 }
