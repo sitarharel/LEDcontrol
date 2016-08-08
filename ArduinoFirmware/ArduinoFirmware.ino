@@ -27,10 +27,13 @@ void loop() {
     Serial.readBytes((char*) input, 3);
     // set the brightness of the LEDs:
     int offThreshold = 0;
+    int changeThreshold = 5;
     int r = ((int) input[0]) + 128;
     int g = ((int) input[1]) + 128;
     int b = ((int) input[2]) + 128;
-    if(r != oldR || g != oldG || b != oldB){
+    if(r > oldR + changeThreshold || r < oldR - changeThreshold ||
+        g > oldG + changeThreshold || g < oldG - changeThreshold ||
+        b > oldB + changeThreshold || b < oldB - changeThreshold ){
         // analogWrite(RED, r > offThreshold ? r : 0);
         // analogWrite(GREEN, g > offThreshold ? g : 0);
         // analogWrite(BLUE, b > offThreshold ? b : 0);
