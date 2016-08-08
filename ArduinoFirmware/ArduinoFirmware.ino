@@ -14,9 +14,16 @@ void setup() {
     pinMode(GREEN, OUTPUT);
     pinMode(BLUE, OUTPUT);
 
+        // for pins 5 & 6:
     TCCR0B = TCCR0B & B11111000 | B00000010;
-    TCCR1B = TCCR1B & B11111000 | B00000010;  
+    // set timer 0 divisor to 8 for PWM frequency of  7812.50 Hz
+        // for pins 9 & 10:
+    TCCR1B = TCCR1B & B11111000 | B00000010;
+    // set timer 1 divisor to     8 for PWM frequency of  3921.16 Hz
+        // for pins 3 & 11:
     TCCR2B = TCCR2B & B11111000 | B00000010;
+    // set timer 2 divisor to     8 for PWM frequency of  3921.16 Hz
+
     oldR = 0;
     oldG = 0;
     oldB = 0;
@@ -24,46 +31,25 @@ void setup() {
 
 void loop() {
     int8_t input[3];
-
-    // // check if data has been sent from the computer:
-    // if (Serial.available()) {
-    //     // read the most recent byte (which will be from -128 to 127):
-    //     Serial.readBytes((char*) input, 3);
-    //     // set the brightness of the LEDs:
-    //     int offThreshold = 0;
-    //     int changeThreshold = 1;
-    //     int r = ((int) input[0]) + 128;
-    //     int g = ((int) input[1]) + 128;
-    //     int b = ((int) input[2]) + 128;
-    //     if(r > oldR + changeThreshold || r < oldR - changeThreshold ||
-    //         g > oldG + changeThreshold || g < oldG - changeThreshold ||
-    //         b > oldB + changeThreshold || b < oldB - changeThreshold ){
-    //             analogWrite(RED, r > offThreshold ? r : 0);
-    //             analogWrite(GREEN, g > offThreshold ? g : 0);
-    //             analogWrite(BLUE, b > offThreshold ? b : 0);
-    //             oldR = r;
-    //             oldG = g;
-    //             oldB = b;
-    //         }else{
-    //             analogWrite(RED, 0);
-    //             analogWrite(GREEN, 0);
-    //             analogWrite(BLUE, 0);
-    //         }
-    //         // Serial.print("r: ");
-    //         //  Serial.print(r);
-    //         //  Serial.print(" old r: ");
-    //         //  Serial.println(oldR);
-    //         // Serial.print("g: ");
-    //         //  Serial.print(g);
-    //         //  Serial.print(" old g: ");
-    //         //  Serial.println(oldG);
-    //         // Serial.print("b: ");
-    //         //  Serial.print(b);
-    //         //  Serial.print(" old b: ");
-    //         //  Serial.println(oldB);
-    //     }else{
-            analogWrite(RED, 20);
-            analogWrite(GREEN, 20);
-            analogWrite(BLUE, 20);
-        // }
+    // check if data has been sent from the computer:
+    if (Serial.available()) {
+        // read the most recent byte (which will be from -128 to 127):
+        Serial.readBytes((char*) input, 3);
+        // set the brightness of the LEDs:
+        int offThreshold = 0;
+        int changeThreshold = 1;
+        int r = ((int) input[0]) + 128;
+        int g = ((int) input[1]) + 128;
+        int b = ((int) input[2]) + 128;
+        if(r > oldR + changeThreshold || r < oldR - changeThreshold ||
+            g > oldG + changeThreshold || g < oldG - changeThreshold ||
+            b > oldB + changeThreshold || b < oldB - changeThreshold ){
+                analogWrite(RED, r > offThreshold ? r : 0);
+                analogWrite(GREEN, g > offThreshold ? g : 0);
+                analogWrite(BLUE, b > offThreshold ? b : 0);
+                oldR = r;
+                oldG = g;
+                oldB = b;
+            }
+        }
     }
