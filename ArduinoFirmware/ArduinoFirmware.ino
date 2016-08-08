@@ -37,9 +37,9 @@ void loop() {
         // analogWrite(RED, r > offThreshold ? r : 0);
         // analogWrite(GREEN, g > offThreshold ? g : 0);
         // analogWrite(BLUE, b > offThreshold ? b : 0);
-        analogWrite(RED, 0);
-        analogWrite(GREEN, 0);
-        analogWrite(BLUE, 250);
+        analogWrite(RED, oldR);
+        analogWrite(GREEN, oldG);
+        analogWrite(BLUE, oldB);
         oldR = r;
         oldG = g;
         oldB = b;
