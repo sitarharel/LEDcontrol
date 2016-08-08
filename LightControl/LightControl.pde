@@ -143,7 +143,7 @@ void outputToArduino(int r, int g, int b){
 	rect(2 * width/9, height - (b * height/255) - 5, width / 9, 10, 5, 5, 5, 5);
 	int allowedchange = 1;
 
-	//if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
+
 	if(isarduino){
 		byte[] send = {(byte)(r - 128), (byte)(g - 128), (byte)(b - 128)};
 		port.write(send);
