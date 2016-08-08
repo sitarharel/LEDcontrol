@@ -34,19 +34,19 @@ void loop() {
     if(r > oldR + changeThreshold || r < oldR - changeThreshold ||
         g > oldG + changeThreshold || g < oldG - changeThreshold ||
         b > oldB + changeThreshold || b < oldB - changeThreshold ){
-        // analogWrite(RED, r > offThreshold ? r : 0);
-        // analogWrite(GREEN, g > offThreshold ? g : 0);
-        // analogWrite(BLUE, b > offThreshold ? b : 0);
-        analogWrite(RED, oldR);
-        analogWrite(GREEN, oldG);
-        analogWrite(BLUE, oldB);
+        analogWrite(RED, r > offThreshold ? r : 0);
+        analogWrite(GREEN, g > offThreshold ? g : 0);
+        analogWrite(BLUE, b > offThreshold ? b : 0);
+        // analogWrite(RED, oldR);
+        // analogWrite(GREEN, oldG);
+        // analogWrite(BLUE, oldB);
         oldR = r;
         oldG = g;
         oldB = b;
     }else{
-        analogWrite(RED, 250);
-        analogWrite(GREEN, 0);
-        analogWrite(BLUE, 0);
+        // analogWrite(RED, 250);
+        // analogWrite(GREEN, 0);
+        // analogWrite(BLUE, 0);
     }
   }
 }
