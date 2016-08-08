@@ -14,9 +14,9 @@ void setup() {
     pinMode(GREEN, OUTPUT);
     pinMode(BLUE, OUTPUT);
 
-    setPwmFrequency(RED, 8);
-    setPwmFrequency(GREEN, 8);
-    setPwmFrequency(BLUE, 8);
+    TCCR0B = TCCR0B & B11111000 | B00000010;
+    TCCR1B = TCCR1B & B11111000 | B00000010;  
+    TCCR2B = TCCR2B & B11111000 | B00000010;
     oldR = 0;
     oldG = 0;
     oldB = 0;
