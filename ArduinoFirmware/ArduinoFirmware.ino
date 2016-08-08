@@ -1,6 +1,10 @@
 const int RED = 6;
 const int GREEN = 3;
 const int BLUE = 9;
+int oldR = 0;
+int oldG = 0;
+int oldB = 0;
+
 
 void setup() {
   // initialize the serial communication:
@@ -23,8 +27,13 @@ void loop() {
     int r = ((int) input[0]) + 128;
     int g = ((int) input[1]) + 128;
     int b = ((int) input[2]) + 128;
-    analogWrite(RED, r > offThreshold ? r : 0);
-    analogWrite(GREEN, g > offThreshold ? g : 0);
-    analogWrite(BLUE, b > offThreshold ? b : 0);
+    if(r != oldR || g != oldG || b != oldB){
+        analogWrite(RED, r > offThreshold ? r : 0);
+        analogWrite(GREEN, g > offThreshold ? g : 0);
+        analogWrite(BLUE, b > offThreshold ? b : 0);
+        oldR = r;
+        oldG = g;
+        oldB = b;
+    }
   }
 }

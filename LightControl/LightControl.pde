@@ -171,8 +171,10 @@ void stop() {
 // This happens as a separate thread and can take as long as it wants
 void requestData() {
 	// {webcontrol: false, lightmode: "static", music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
+	webcontrol = false;
 	JSONObject json = loadJSONObject("http://sitarbucks.com/lightstatus/");
-	webstatic = json.getJSONObject("static");
-
-	webcontrol = json.getBoolean("webcontrol");
+	if(json != null){
+		webstatic = json.getJSONObject("static");
+		webcontrol = json.getBoolean("webcontrol");
+	}
 }
