@@ -34,6 +34,10 @@ void loop() {
         oldR = r;
         oldG = g;
         oldB = b;
+    }else{
+        analogWrite(RED, 0);
+        analogWrite(GREEN, 0);
+        analogWrite(BLUE, 0);
     }
   }
 }
