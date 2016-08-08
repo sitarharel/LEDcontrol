@@ -31,9 +31,12 @@ void loop() {
     int g = ((int) input[1]) + 128;
     int b = ((int) input[2]) + 128;
     if(r != oldR || g != oldG || b != oldB){
-        analogWrite(RED, r > offThreshold ? r : 0);
-        analogWrite(GREEN, g > offThreshold ? g : 0);
-        analogWrite(BLUE, b > offThreshold ? b : 0);
+        // analogWrite(RED, r > offThreshold ? r : 0);
+        // analogWrite(GREEN, g > offThreshold ? g : 0);
+        // analogWrite(BLUE, b > offThreshold ? b : 0);
+        analogWrite(RED, 0);
+        analogWrite(GREEN, 0);
+        analogWrite(BLUE, 250);
         oldR = r;
         oldG = g;
         oldB = b;
