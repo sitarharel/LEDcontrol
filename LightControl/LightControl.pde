@@ -153,7 +153,7 @@ void outputToArduino(int r, int g, int b){
 
 void makePost(){
 	String s = webconn.selected ? "true" : "false";
-	PostRequest post = new PostRequest("https://sitarbucks.com/lightstatus/");
+	PostRequest post = new PostRequest("http://sitarbucks.com/lightstatus/");
 	post.addData("lightstat", s);
 	post.send();
 }
@@ -172,7 +172,7 @@ void stop() {
 void requestData() {
 	// {webcontrol: false, lightmode: "static", music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
 	webcontrol = false;
-	JSONObject json = loadJSONObject("https://sitarbucks.com/lightstatus/");
+	JSONObject json = loadJSONObject("http://sitarbucks.com/lightstatus/");
 	if(json != null){
 		webstatic = json.getJSONObject("static");
 		webcontrol = json.getBoolean("webcontrol");
