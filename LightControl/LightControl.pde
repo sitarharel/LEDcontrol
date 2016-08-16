@@ -12,6 +12,7 @@ boolean webcontrol = false;
 int[] interRGB = {0, 0, 0};
 boolean useConnection = true;
 JSONObject webstatic = new JSONObject();
+JSONObject webfade = new JSONObject();
 int webstate = 3;
 
 int[] oldRGBoutput = {0, 0, 0};
@@ -84,11 +85,14 @@ void draw() {
 		int[] musicval = mc.doMusicControl();
 		output = musicval;
 	} else if (state == 2) {
+		if(webcontrol){
+			fc.setFadeSpeed(webfade.getFloat('speed'));
+		}
 		int[] fadeval = fc.doFadeControl();
 		output = fadeval;
 	} else if (state == 3) {
 		if(webcontrol){
-			int[] res = webcontrolResult();
+			int[] res = staticRGBArray();
 			rbar.setVal((float) res[0]);
 			gbar.setVal((float) res[1]);
 			bbar.setVal((float) res[2]);
@@ -102,7 +106,7 @@ void draw() {
 	}
 
 	// if(webcontrol){
-	// 	output = webcontrolResult();
+	// 	output = staticRGBArray();
 	// }
 	outputToArduino(output[0], output[1], output[2]);
 
@@ -158,7 +162,7 @@ void makePost(){
 	post.send();
 }
 
-int[] webcontrolResult() {
+int[] staticRGBArray() {
 	int[] res = {webstatic.getInt("r"), webstatic.getInt("g"), webstatic.getInt("b")};
 	return res;
 }
@@ -176,5 +180,7 @@ void requestData() {
 	if(json != null){
 		webstatic = json.getJSONObject("static");
 		webcontrol = json.getBoolean("webcontrol");
+		webstate = json.getInt("lightmode");
+		webfade = json.getJSONObject("fade");
 	}
 }

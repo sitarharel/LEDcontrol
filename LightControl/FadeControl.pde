@@ -14,6 +14,11 @@ class FadeControl {
         return fadeCoded(fdelay);
     }
 
+    void setFadeSpeed(float speed) {
+        fadespeed.setVal(speed);
+    }
+
+
     int[] fadeCoded(int d) {
         //int[][] f = {{1, -1, 0},{-1, 0, 1},{1, 1, -1},{-1, -1, 1},{0, 1, -1},{1, -1, 1},{-1, 1, -1}};
         //this is an encoding of the fade order
