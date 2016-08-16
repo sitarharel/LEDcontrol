@@ -65,7 +65,7 @@ void setup() {
 
 void draw() {
 	background(0);
-	if (frameCount % 3 == 0 && useConnection) {
+	if (frameCount % 5 == 0 && useConnection) {
 		thread("requestData");
 	}
 	int[] output = new int[3];
@@ -86,7 +86,7 @@ void draw() {
 		output = musicval;
 	} else if (state == 2) {
 		if(webcontrol){
-			fc.setFadeSpeed(webfade.getFloat('speed'));
+			fc.setFadeSpeed(webfade.getFloat("speed"));
 		}
 		int[] fadeval = fc.doFadeControl();
 		output = fadeval;
@@ -113,6 +113,7 @@ void draw() {
 	white.draw(255, 255, 255);
 	dim.draw(255, 0, 255);
 	stat.draw(0, 0, 255);
+	print(webcontrol + "\n");
 	webconn.setSelected(webcontrol);
 	webconn.draw(true);
 
@@ -175,7 +176,6 @@ void stop() {
 // This happens as a separate thread and can take as long as it wants
 void requestData() {
 	// {webcontrol: false, lightmode: "static", music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
-	webcontrol = false;
 	JSONObject json = loadJSONObject("http://sitarbucks.com/lightstatus/");
 	if(json != null){
 		webstatic = json.getJSONObject("static");
