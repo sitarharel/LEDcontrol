@@ -23,6 +23,7 @@ float partswhite = 0; //scale of 0 to 1 for how much is just white (1 is all whi
 
 Bar rbar, gbar, bbar, dim, white, fadespeed;
 Flip stat;
+int oldstate = 0;
 MusicControl mc;
 FadeControl fc;
 Toggle webconn;
@@ -82,6 +83,8 @@ void draw() {
 	state = stat.val + 1;
 
 	if (state == 1) {
+		if(oldstate != state) 
+			mc = new MusicControl();
 		int[] musicval = mc.doMusicControl();
 		output = musicval;
 	} else if (state == 2) {
@@ -113,7 +116,6 @@ void draw() {
 	white.draw(255, 255, 255);
 	dim.draw(255, 0, 255);
 	stat.draw(0, 0, 255);
-	print(webcontrol + "\n");
 	webconn.setSelected(webcontrol);
 	webconn.draw(true);
 
@@ -125,6 +127,7 @@ void draw() {
 	if (isarduino && Arduino.list().length <= 1) {
 		isarduino = false;
 	}
+	oldstate = state;
 }
 
 void outputToArduino(int r, int g, int b){
