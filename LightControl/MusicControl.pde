@@ -21,16 +21,19 @@ class MusicControl {
     Bar smooth, power, refresh, maxv;
 
     MusicControl() {
+        init();
+        smooth = new Bar("smooth", 425, new PVector(1, 100), avgamount);
+        power = new Bar("contrast", 200, new PVector(0, 5), powV);
+        refresh = new Bar("refresh", 350, new PVector(0, 3), ref);
+        maxv = new Bar("max", 275, new PVector(0, 1), maxvel);
+    }
+
+    void init(){
         minim = new Minim(this);
         song = minim.getLineIn();
         song.enableMonitoring();
         song.mute();
         fft = new FFT(song.bufferSize(), 2048);
-
-        smooth = new Bar("smooth", 425, new PVector(1, 100), avgamount);
-        power = new Bar("contrast", 200, new PVector(0, 5), powV);
-        refresh = new Bar("refresh", 350, new PVector(0, 3), ref);
-        maxv = new Bar("max", 275, new PVector(0, 1), maxvel);
     }
 
     int[] doMusicControl() {

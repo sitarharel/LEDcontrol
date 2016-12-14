@@ -1,6 +1,5 @@
 import processing.serial.*;
 import cc.arduino.*;
-
 import http.requests.*;
 
 Arduino arduino;
@@ -82,10 +81,12 @@ void draw() {
 	dimness = dim.val;
 
 	state = stat.val + 1;
+	if(oldstate != state) mc.stop();
 
 	if (state == 1) {
 		if(oldstate != state) {
-			mc = new MusicControl();
+			System.out.println("new mc");
+			mc.init();
 		}
 		int[] musicval = mc.doMusicControl();
 		output = musicval;
