@@ -17,6 +17,7 @@ int webstate = 3;
 
 int[] oldRGBoutput = {0, 0, 0};
 
+boolean debug = true;
 boolean isarduino = true;
 float dimness = 1; //scale of 0 to 1
 float partswhite = 0; //scale of 0 to 1 for how much is just white (1 is all white, 0 is all music visualisztion)
@@ -30,7 +31,7 @@ Toggle webconn;
 
 void settings() {
 	size(1500, 800, P3D);
-	fullScreen();
+	if(!debug) fullScreen();
 }
 
 void setup() {
@@ -42,7 +43,7 @@ void setup() {
 
 	surface.setResizable(true);
 
-	if (Arduino.list().length > 1) {
+	if (!debug && Arduino.list().length > 1) {
 		port = new Serial(this, Arduino.list()[1], 57600);
 	} else {
 		isarduino = false;
@@ -83,8 +84,9 @@ void draw() {
 	state = stat.val + 1;
 
 	if (state == 1) {
-		if(oldstate != state) 
+		if(oldstate != state) {
 			mc = new MusicControl();
+		}
 		int[] musicval = mc.doMusicControl();
 		output = musicval;
 	} else if (state == 2) {
@@ -120,11 +122,11 @@ void draw() {
 	webconn.draw(true);
 
 
-	if (!isarduino && Arduino.list().length > 1) {
+	if (!debug && !isarduino && Arduino.list().length > 1) {
 		port = new Serial(this, Arduino.list()[1], 57600);
 		isarduino = true;
 	}
-	if (isarduino && Arduino.list().length <= 1) {
+	if (debug || isarduino && Arduino.list().length <= 1) {
 		isarduino = false;
 	}
 	oldstate = state;
