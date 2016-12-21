@@ -10,6 +10,8 @@ class MusicControl {
     float rpusher = 100, rpv = 0;
     float gpusher = 100, gpv = 0;
     float bpusher = 100, bpv = 0;
+
+    float hue_pusher = 100, hpv = 0;
     float max = 0;
     float[][] fftavgs = new float[3][100];
     int fahindex = -1;
@@ -19,7 +21,9 @@ class MusicControl {
     float ref = 1.15;
     int avgamount = 15;
     Bar smooth, power, refresh, maxv;
-
+    // TODO: spectrum localization (use sample mean and variance)
+    // TODO: determine smoothness based on beat count
+    // TODO: normalize fft to what people can actually hear (like gamma)
     MusicControl() {
         init();
         smooth = new Bar("smooth", 425, new PVector(1, 100), avgamount);
@@ -34,6 +38,8 @@ class MusicControl {
         song.enableMonitoring();
         song.mute();
         fft = new FFT(song.bufferSize(), 2048);
+        fft.logAverages( 12, 12 );
+        fft.window( FFT.HANN );
     }
 
     int[] doMusicControl() {
@@ -49,6 +55,50 @@ class MusicControl {
         avgamount = (int) smooth.val;
         return ret;
     }
+
+    void drawSmartAvg(boolean push) {
+        // since logarithmically spaced averages are not equally spaced
+        // we can't precompute the width for all averages
+        int xcount = 0;
+        float centerFrequency = 0;
+        float spectrumScale = 10;
+        float sum = 0;
+        float samples = 0;
+        float draw_width = 5;
+        float[] vals = new float[fft.avgSize()];
+        for(int i = 0; i < fft.avgSize(); i++)
+        { 
+          float h = fft.getAvg(i)*spectrumScale;
+          vals[i] = h;
+          sum += h * i;
+          samples += h;
+          noStroke();
+          fill(255);
+          rect( xcount, (height - 20) - h, draw_width, h);
+          xcount += draw_width;
+        }
+        float sample_mean = samples > 0 ? sum/samples : fft.avgSize()/2;
+        float standard_dev = 0;
+        for (int i = 0; i < vals.length; i++){
+            standard_dev += Math.pow(i - sample_mean, 2);
+        }
+        standard_dev = sqrt((float) standard_dev/(vals.length - 1));
+        // line(sample_mean * draw_width, 0, sample_mean * draw_width, height);
+        stroke(5,0,255);
+        line((sample_mean - standard_dev) * draw_width, standard_dev, (sample_mean - standard_dev) * draw_width, height);
+        line((sample_mean + standard_dev) * draw_width, standard_dev, (sample_mean + standard_dev) * draw_width, height);
+        stroke(255,0,0);
+        line(0, (height-samples), width, (height-samples));
+
+        if(push){
+            // float hv = (sample_mean - hue_pusher) * 0.1;
+            hue_pusher = hue_pusher + (sample_mean - hue_pusher) * (1.0/avgamount);
+            // System.out.println((hue_pusher));
+            // hue_pusher = nh;
+            line(hue_pusher * draw_width, 0, hue_pusher * draw_width, height);
+        }
+    }
+
 
     void drawAvg(int detail, float specpercent, boolean push) {
         stroke(0, 0, 255, 200);
@@ -78,11 +128,11 @@ class MusicControl {
                 if (i == 1) if (vals[i] > gpusher) gpv = (vals[i] - gpusher) * 0.3;
                 if (i == 2) if (vals[i] > bpusher) bpv = (vals[i] - bpusher) * 0.3;
                 stroke(255, 0, 0, 200);
-                rect((float) l * width / specsize * specpercent, height - vals[i], (float) (r - l) * width / specsize * specpercent, height);
-                vals[i] = fftavgs[i][fahindex];
+                // rect((float) l * width / specsize * specpercent, height - vals[i], (float) (r - l) * width / specsize * specpercent, height);
+                // vals[i] = fftavgs[i][fahindex];
             }
-            stroke(0,0,255);
-            rect((float) l * width / specsize * specpercent, height - vals[i], (float) (r - l) * width / specsize * specpercent, height);
+            // stroke(0,0,255);
+            // rect((float) l * width / specsize * specpercent, height - vals[i], (float) (r - l) * width / specsize * specpercent, height);
         }
     }
 
@@ -98,8 +148,10 @@ class MusicControl {
     int[] musicVis() {
         stroke(255, 0, 0, 128);
 
-        drawAvg(13, 0.3333, true);
-        drawAvg(101, 0.333, false);
+        // drawAvg(13, 0.3333, true);
+        // drawAvg(101, 0.333, false);
+        // drawSmartAvg(201, 1, false);
+        drawSmartAvg(true);
         if (max > 0) max -= maxvel;
         stroke(255, 255, 255);
         line(0, height - max, width, height - max);
@@ -122,15 +174,27 @@ class MusicControl {
         if (bpusher >= 0) bpusher += bpv;
         if (bpusher < 0) bpusher = 0;
 
-        int[] ret = new int[3];
-        ret[0] = (int) (pow(rpusher, powV) * 255.0 / pow(max, powV) * 0.7 * dimness * (1 - partswhite) + 255 * partswhite * dimness);
-        ret[1] = (int) (pow(gpusher, powV) * 255.0 / pow(max, powV) * 0.85 * dimness * (1 - partswhite) + 255 * partswhite * dimness);
-        ret[2] = (int) (pow(bpusher, powV) * 255.0 / pow(max, powV) * 1 * dimness * (1 - partswhite) + 255 * partswhite * dimness);
+        // int[] ret = new int[3];
+        // ret[0] = (int) (pow(rpusher, powV) * 255.0 / pow(max, powV) * 0.7 * dimness * (1 - partswhite) + 255 * partswhite * dimness);
+        // ret[1] = (int) (pow(gpusher, powV) * 255.0 / pow(max, powV) * 0.85 * dimness * (1 - partswhite) + 255 * partswhite * dimness);
+        // ret[2] = (int) (pow(bpusher, powV) * 255.0 / pow(max, powV) * 1 * dimness * (1 - partswhite) + 255 * partswhite * dimness);
         
         stroke(255);
+
+        colorMode(HSB, 100);
+        color c = color(hue_pusher*3.5, 70, 100);
+        // System.out.println(hue_pusher*3.5);
+
+        // System.out.println(ret[0] + "," + ret[1] + "," + ret[2]);
+        int[] ret = rgbToArr(red(c), green(c), blue(c));
+        colorMode(RGB, 255);        
         return ret;
     }
 
+
+    public int[] rgbToArr(float r, float g, float b) {
+        return new int[]{(int) constrain(r, 0, 255), (int) constrain(g, 0, 255), (int) constrain(b, 0, 255)};
+    }
 
     void stop() {
         song.disableMonitoring();

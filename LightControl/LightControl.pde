@@ -2,6 +2,8 @@ import processing.serial.*;
 import cc.arduino.*;
 import http.requests.*;
 
+// ~/Programs/processing-3.0.2/processing-java --sketch="LightControl" --run
+
 Arduino arduino;
 Serial port;
 
@@ -9,7 +11,7 @@ int state = 1;
 
 boolean webcontrol = false;
 int[] interRGB = {0, 0, 0};
-boolean useConnection = true;
+boolean useConnection = false;
 JSONObject webstatic = new JSONObject();
 JSONObject webfade = new JSONObject();
 int webstate = 3;
@@ -59,7 +61,7 @@ void setup() {
 	bbar = new Bar("blue", 200, new PVector(0, 255), 255);
 
 	String[] p = {"music", "fade", "static"};
-	stat = new Flip("state", (width - 150 ) / 2, 50, p, state);
+	stat = new Flip("state", (width - 150 ) / 2, 50, p, state - 1);
 	String[] ops = {"Web control on", "Web control off"};
 	webconn = new Toggle(width/2, height/2, 100, 100, ops, true);
 }
