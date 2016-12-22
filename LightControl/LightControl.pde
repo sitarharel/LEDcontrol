@@ -143,6 +143,7 @@ void outputToArduino(int r, int g, int b){
 	fill(r, g, b);
 	noStroke();
 	rect(width / 2 - width / 6, 0, width / 3, height);
+	// rect(0, 0, width, height);
 	strokeWeight(3);
 
 	fill(200, 0, 0);
