@@ -48,7 +48,6 @@ class MusicControl {
     }
 
     void drawSmartAvg(boolean push) {
-        int xcount = 0;
         float centerFrequency = 0;
         float spectrumScale = 8;
         float sum = 0;
@@ -63,8 +62,7 @@ class MusicControl {
           samples += h;
           noStroke();
           fill(255);
-          rect( xcount, (height - 20) - h, draw_width, h);
-          xcount += draw_width;
+          rect(i * draw_width, (height - 20) - h, draw_width, h);
         }
         float sample_mean = samples > 0 ? sum/samples : fft.avgSize()/2;
         // float standard_dev = 0;
@@ -81,7 +79,8 @@ class MusicControl {
             if(hue_max < hue_pusher) hue_max = hue_pusher;
 
             br_pusher = br_pusher + (samples*0.1 - br_pusher) * (5.0/max(10.0, avgamount));
-            if (br_max > 0) br_max -= Math.pow(br_max - br_pusher, 2) * (0.0004) *maxvel;
+            //maybe give this a different speed when it goes down vs up
+            if (br_max > 0) br_max -= Math.pow(br_max - br_pusher, 2) * (0.0004) *maxvel; 
             if (br_pusher > br_max) br_max = br_pusher;
 
             stroke(255, 0, 0);

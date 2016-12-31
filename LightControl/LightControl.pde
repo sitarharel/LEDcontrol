@@ -18,7 +18,7 @@ int webstate = 3;
 
 int[] oldRGBoutput = {0, 0, 0};
 
-boolean debug = true;
+boolean debug = false;
 boolean isarduino = true;
 float dimness = 1; //scale of 0 to 1
 float partswhite = 0; //scale of 0 to 1 for how much is just white (1 is all white, 0 is all music visualisztion)
