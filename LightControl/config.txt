@@ -1,0 +1,10 @@
+debug: false
+
+fullscreen: true
+
+# If the serial port isn't connecting, try incrementing this
+serial_offset: 0
+
+networking: false
+
+api_key: 12345default12345

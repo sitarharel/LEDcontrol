@@ -1,17 +1,16 @@
 import processing.serial.*;
 import cc.arduino.*;
 import http.requests.*;
+import java.util.*;
 
 // ~/Programs/processing-3.0.2/processing-java --sketch="LightControl" --run
 
-Arduino arduino;
 Serial port;
 
 int state = 1;
-
 boolean webcontrol = false;
 int[] interRGB = {0, 0, 0};
-boolean useConnection = false;
+
 JSONObject webstatic = new JSONObject();
 JSONObject webfade = new JSONObject();
 int webstate = 3;
@@ -19,9 +18,14 @@ int webstate = 3;
 int[] oldRGBoutput = {0, 0, 0};
 
 boolean debug = false;
+boolean networking = false;
+boolean fullscreen = true;
+String api_key = "";
+int serial_offset = 0;
+
 boolean isarduino = true;
 float dimness = 1; //scale of 0 to 1
-float partswhite = 0; //scale of 0 to 1 for how much is just white (1 is all white, 0 is all music visualisztion)
+float partswhite = 0; //scale of 0 to 1 for how much is just white (1 is all white, 0 is all music visualization)
 
 Bar rbar, gbar, bbar, dim, white, fadespeed;
 Flip stat;
@@ -32,7 +36,8 @@ Toggle webconn;
 
 void settings() {
 	size(1500, 800, P3D);
-	if(!debug) fullScreen();
+	loadSettings();
+	if(!debug && fullscreen) fullScreen();
 }
 
 void setup() {
@@ -43,9 +48,15 @@ void setup() {
 	webstatic.setFloat("white", 0.0);
 
 	surface.setResizable(true);
+	if(debug){
+		for(String port : portList()){
+			System.out.println(port);
+		}
+	}
 
-	if (!debug && Arduino.list().length > 1) {
-		port = new Serial(this, Arduino.list()[1], 57600);
+	String[] ports = portList();
+	if (!debug && ports.length > serial_offset) {
+		port = new Serial(this, ports[serial_offset], 57600);
 	} else {
 		isarduino = false;
 	}
@@ -63,12 +74,12 @@ void setup() {
 	String[] p = {"music", "fade", "static"};
 	stat = new Flip("state", (width - 150 ) / 2, 50, p, state - 1);
 	String[] ops = {"Web control on", "Web control off"};
-	webconn = new Toggle(width/2, height/2, 100, 100, ops, true);
+	if(networking) webconn = new Toggle(width/2, height/2, 100, 100, ops, true);
 }
 
 void draw() {
 	background(0);
-	if (frameCount % 5 == 0 && useConnection) {
+	if (frameCount % 5 == 0 && networking) {
 		thread("requestData");
 	}
 	int[] output = new int[3];
@@ -86,10 +97,7 @@ void draw() {
 	if(oldstate != state) mc.stop();
 
 	if (state == 1) {
-		if(oldstate != state) {
-			System.out.println("new mc");
-			mc.init();
-		}
+		if(oldstate != state) mc.init();
 		int[] musicval = mc.doMusicControl();
 		output = musicval;
 	} else if (state == 2) {
@@ -113,23 +121,22 @@ void draw() {
 		bbar.draw(0, 0, 255);
 	}
 
-	// if(webcontrol){
-	// 	output = staticRGBArray();
-	// }
 	outputToArduino(output[0], output[1], output[2]);
 
 	white.draw(255, 255, 255);
 	dim.draw(255, 0, 255);
 	stat.draw(0, 0, 255);
-	webconn.setSelected(webcontrol);
-	webconn.draw(true);
-
-
-	if (!debug && !isarduino && Arduino.list().length > 1) {
-		port = new Serial(this, Arduino.list()[1], 57600);
-		isarduino = true;
+	if(networking){
+		webconn.setSelected(webcontrol);
+		webconn.draw(true);
 	}
-	if (debug || isarduino && Arduino.list().length <= 1) {
+
+	String[] ports = portList();
+	if (!debug && !isarduino && ports.length > serial_offset) {
+		port = new Serial(this, ports[serial_offset], 57600);
+		isarduino = true;
+	} 
+	if (debug || isarduino && ports.length <= serial_offset) {
 		isarduino = false;
 	}
 	oldstate = state;
@@ -143,9 +150,8 @@ void outputToArduino(int r, int g, int b){
 	fill(r, g, b);
 	noStroke();
 	rect(width / 2 - width / 6, 0, width / 3, height);
-	// rect(0, 0, width, height);
-	strokeWeight(3);
 
+	strokeWeight(3);
 	fill(200, 0, 0);
 	stroke(255, 0, 0);
 	rect(0, height - (r * height/255) - 5, width / 9, 10, 5, 5, 5, 5);
@@ -192,4 +198,44 @@ void requestData() {
 		webstate = json.getInt("lightmode");
 		webfade = json.getJSONObject("fade");
 	}
+}
+
+String[] portList(){
+	List<String> res = new ArrayList<String>();
+	for(String port : Serial.list()){
+		if(port.substring(0, 9).equals("/dev/ttyS")) continue;
+		res.add(port);
+	}
+
+	String[] arr = new String[res.size()];
+	return res.toArray(arr);
+}
+
+void loadSettings(){	
+	for (String line : loadStrings("config.txt")) {
+		line = line.replaceAll("\\s+",""); //remove whitespace
+		if(line.length() == 0 || line.charAt(0) == '#') continue; //continue loop if it's a comment
+		String[] setting = line.split(":");
+		if(setting.length >= 2){
+			switch (setting[0]) {
+				case "networking":  
+					if(setting[1].equals("true")) networking = true;
+					break;
+				case "api_key":  
+					api_key = setting[1];
+					break;
+				case "serial_offset":  
+					serial_offset = Integer.parseInt(setting[1]);
+					break;
+				case "fullscreen":  
+					if(setting[1].equals("false")) fullscreen = false;
+					break;
+				case "debug":  
+					if(setting[1].equals("true")) debug = true;
+					break;
+				default: break;
+			}	
+		}
+	}
+	System.out.println("Loaded settings");
 }
