@@ -11,9 +11,13 @@ int state = 1;
 boolean webcontrol = false;
 int[] interRGB = {0, 0, 0};
 
-JSONObject webstatic = new JSONObject();
+boolean queuePost = false;
+String webstatic = "";
 JSONObject webfade = new JSONObject();
 int webstate = 3;
+
+// String base_url = "http://sitarbucks.com";
+String base_url = "http://localhost:8000";
 
 int[] oldRGBoutput = {0, 0, 0};
 
@@ -33,6 +37,8 @@ int oldstate = 0;
 MusicControl mc;
 FadeControl fc;
 Toggle webconn;
+int[] output = new int[3];
+int race_buffer = 0;
 
 void settings() {
 	size(1500, 800, P3D);
@@ -41,11 +47,9 @@ void settings() {
 }
 
 void setup() {
-	webstatic.setInt("r", 180);
-	webstatic.setInt("g", 0);
-	webstatic.setInt("b", 50);
-	webstatic.setFloat("dim", 1.0);
-	webstatic.setFloat("white", 0.0);
+	webstatic = "#000000";
+	webfade.setFloat("dim", 1.0);
+	webfade.setFloat("white", 0.0);
 
 	surface.setResizable(true);
 	if(debug){
@@ -74,28 +78,18 @@ void setup() {
 	String[] p = {"music", "fade", "static"};
 	stat = new Flip("state", (width - 150 ) / 2, 50, p, state - 1);
 	String[] ops = {"Web control on", "Web control off"};
-	if(networking) webconn = new Toggle(width/2, height/2, 100, 100, ops, true);
+	// if(networking) webconn = new Toggle(width/2, height/2, 100, 100, ops, true);
 }
 
 void draw() {
 	background(0);
-	if (frameCount % 5 == 0 && networking) {
-		thread("requestData");
-	}
-	int[] output = new int[3];
-	// int select = webcontrol ? webstate : state;
-	if(webcontrol){
-		stat.setVal(webstate - 1);
-		dim.setVal(webstatic.getFloat("dim"));
-		white.setVal(webstatic.getFloat("white"));
-	}
 
 	partswhite = white.val;
 	dimness = dim.val;
 
 	state = stat.val + 1;
 	if(oldstate != state) mc.stop();
-
+	boolean same = true;
 	if (state == 1) {
 		if(oldstate != state) mc.init();
 		int[] musicval = mc.doMusicControl();
@@ -107,28 +101,32 @@ void draw() {
 		int[] fadeval = fc.doFadeControl();
 		output = fadeval;
 	} else if (state == 3) {
-		if(webcontrol){
-			int[] res = staticRGBArray();
-			rbar.setVal((float) res[0]);
-			gbar.setVal((float) res[1]);
-			bbar.setVal((float) res[2]);
-		}
 		output[0] = (int) (constrain(rbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[1] = (int) (constrain(gbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[2] = (int) (constrain(bbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
-		rbar.draw(255, 0, 0);
-		gbar.draw(0, 255, 0);
-		bbar.draw(0, 0, 255);
+		same = same && rbar.draw(255, 0, 0);
+		same = same && gbar.draw(0, 255, 0);
+		same = same && bbar.draw(0, 0, 255);
 	}
+
 
 	outputToArduino(output[0], output[1], output[2]);
 
-	white.draw(255, 255, 255);
-	dim.draw(255, 0, 255);
-	stat.draw(0, 0, 255);
+	same = same && white.draw(255, 255, 255);
+	same = same && dim.draw(255, 0, 255);
+	same = same && stat.draw(0, 0, 255);
 	if(networking){
-		webconn.setSelected(webcontrol);
-		webconn.draw(true);
+		if(race_buffer > 0) race_buffer--;
+		if(!(same && mc.settingsChanged() && fc.settingsChanged())){
+			queuePost = true;
+		}
+		if(queuePost && frameCount % 30 == 0){
+			thread("makePost");
+			queuePost = false;
+			race_buffer = 200;
+		}else if(race_buffer == 0 && frameCount % 30 == 0){
+			thread("requestData");
+		}
 	}
 
 	String[] ports = portList();
@@ -172,15 +170,18 @@ void outputToArduino(int r, int g, int b){
 }
 
 void makePost(){
-	String s = webconn.selected ? "true" : "false";
-	PostRequest post = new PostRequest("http://sitarbucks.com/lightstatus/");
-	post.addData("lightstat", s);
-	post.send();
-}
+	// {webcontrol: false, lightmode: 3, music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 0, g: 0, b: 50} };
+	// String s = webconn.selected ? "true" : "false";
+	PostRequest post = new PostRequest(base_url + "/api/" + api_key + "/update_light_state");
 
-int[] staticRGBArray() {
-	int[] res = {webstatic.getInt("r"), webstatic.getInt("g"), webstatic.getInt("b")};
-	return res;
+	post.addData("webcontrol", "false");
+	post.addData("lightmode", Integer.toString(stat.val + 1));
+	post.addData("music", mc.getStringSettings());
+	post.addData("bright", Integer.toString((int) dim.val*100));
+	post.addData("white", Integer.toString((int) white.val*100));
+	post.addData("fade_speed", Integer.toString((int) fc.getFadeSpeed()));
+	post.addData("static", "#" + hex(color(output[0], output[1], output[2]), 6));
+	post.send();
 }
 
 void stop() {
@@ -190,14 +191,30 @@ void stop() {
 
 // This happens as a separate thread and can take as long as it wants
 void requestData() {
-	// {webcontrol: false, lightmode: "static", music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
-	JSONObject json = loadJSONObject("http://sitarbucks.com/lightstatus/");
+	// {webcontrol: false, lightmode: 3, music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
+	JSONObject json = loadJSONObject(base_url + "/api/" + api_key + "/get_light_state");
+	// GetRequest get = new GetRequest(base_url + "/api/" + api_key + "/get_light_state");
+	// get.send();
+	// println(" " + get.getContent());
+
 	if(json != null){
-		webstatic = json.getJSONObject("static");
-		webcontrol = json.getBoolean("webcontrol");
-		webstate = json.getInt("lightmode");
-		webfade = json.getJSONObject("fade");
+		int[] res = hexToRGB(json.getString("static"));
+		rbar.setVal((float) res[0]);
+		gbar.setVal((float) res[1]);
+		bbar.setVal((float) res[2]);
+		JSONObject nu_mus = json.getJSONObject("music");
+		mc.setSettings(nu_mus.getInt("max"), nu_mus.getInt("sat"), nu_mus.getInt("smooth"));
+		fc.setFadeSpeed((float) json.getInt("fade_speed"));
+		stat.val = json.getInt("lightmode") - 1;
 	}
+}
+
+int[] hexToRGB(String hex){
+	int[] out = new int[3];
+	out[0] = unhex(hex.substring(1,3));
+	out[1] = unhex(hex.substring(3,5));
+	out[2] = unhex(hex.substring(5,7));
+	return out;
 }
 
 String[] portList(){

@@ -1,10 +1,11 @@
 class Bar {
-    float x, val;
+    float x, val, oldval;
     PVector scale;
     String name;
     int w = 70; //42
     int h = 20;
     float distwidth;
+
 
     Bar(String n, float x, PVector scale, float def) {
         this.distwidth = x;
@@ -13,7 +14,8 @@ class Bar {
         name = n;
     }
 
-    void draw(float r, float g, float b) {
+    boolean draw(float r, float g, float b) {
+        float oldval = val;
         update();
         x = width - distwidth;
         color l = color(r * 0.5, g * 0.5, b * 0.5);
@@ -33,6 +35,7 @@ class Bar {
         textAlign(CENTER, CENTER);
         text(val, x, y);
         text(name, x, height - 7 - h / 2);
+        return val == oldval;
     }
 
     void update() {

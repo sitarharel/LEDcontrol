@@ -3,13 +3,14 @@ class FadeControl {
     int fdelay = 12;
 
     int[] currentfade = {0, 255, 0};
+    boolean settings_changed = true;
 
     FadeControl() {
         fadespeed = new Bar("speed", 200, new PVector(0, 100), fdelay);
     }
 
     int[] doFadeControl() {
-        fadespeed.draw(0, 0, 255);
+        settings_changed = fadespeed.draw(0, 0, 255);
         fdelay = (int) fadespeed.val;
         return fadeCoded(fdelay);
     }
@@ -18,6 +19,13 @@ class FadeControl {
         fadespeed.setVal(speed);
     }
 
+    public boolean settingsChanged(){
+        return settings_changed;
+    }
+
+    float getFadeSpeed() {
+        return fadespeed.val;
+    }
 
     int[] fadeCoded(int d) {
         //int[][] f = {{1, -1, 0},{-1, 0, 1},{1, 1, -1},{-1, -1, 1},{0, 1, -1},{1, -1, 1},{-1, 1, -1}};

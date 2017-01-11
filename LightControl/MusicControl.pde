@@ -14,9 +14,8 @@ class MusicControl {
     float maxvel = 0.3;
     int avgamount = 30;
     Bar smooth, saturation, maxv;
-    // TODO: spectrum localization (use sample mean and variance)
+    boolean settings_changed = true;
     // TODO: determine smoothness based on beat count
-    // TODO: normalize fft to what people can actually hear (like gamma) DONE
     MusicControl() {
         init();
         smooth = new Bar("smooth", 350, new PVector(1, 150), avgamount);
@@ -38,12 +37,13 @@ class MusicControl {
     int[] doMusicControl() {
         fft.forward(song.mix);
         int[] ret = musicVis();
-        saturation.draw(0, 0, 255);
+        boolean sat_change = saturation.draw(0, 0, 255);
         sat = saturation.val;
-        maxv.draw(0, 200, 255);
+        boolean max_change = maxv.draw(0, 200, 255);
         maxvel = maxv.val;
-        smooth.draw(255, 200, 0);
+        boolean smooth_change = smooth.draw(255, 200, 0);
         avgamount = (int) smooth.val;
+        settings_changed = sat_change && smooth_change && max_change;
         return ret;
     }
 
@@ -94,6 +94,19 @@ class MusicControl {
         }
     }
 
+    public String getStringSettings(){
+        return "{\"max\": " + ((int) (maxv.val*100)) + ", \"smooth\": " + ((int) smooth.val) + ", \"sat\": " + ((int) saturation.val) + "}";
+    }
+
+    public boolean settingsChanged(){
+        return settings_changed;
+    }
+
+    public void setSettings(int nmaxv, int nsat, int nsmooth){
+        saturation.val = (float) nsat;
+        smooth.val = (float) nsmooth;
+        maxv.val = (float) nmaxv/100;
+    }
 
     int[] musicVis() {
         drawSmartAvg(true);

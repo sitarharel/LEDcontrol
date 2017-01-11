@@ -14,7 +14,8 @@ class Flip {
         name = n;
     }
 
-    void draw(float r, float g, float b) {
+    boolean draw(float r, float g, float b) {
+        int oldval = val;
         update();
         x = width/2 - w * 0.5;
         color l = color(r * 0.5, g * 0.5, b * 0.5);
@@ -37,6 +38,7 @@ class Flip {
         for (int i = 0; i < options.length; i++) {
             text(options[i], x + w / 2, y + h * i + h / 2);
         }
+        return val == oldval;
     }
 
     void update() {
