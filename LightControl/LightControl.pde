@@ -78,7 +78,6 @@ void setup() {
 	String[] p = {"music", "fade", "static"};
 	stat = new Flip("state", (width - 150 ) / 2, 50, p, state - 1);
 	String[] ops = {"Web control on", "Web control off"};
-	// if(networking) webconn = new Toggle(width/2, height/2, 100, 100, ops, true);
 }
 
 void draw() {
@@ -100,6 +99,9 @@ void draw() {
 		}
 		int[] fadeval = fc.doFadeControl();
 		output = fadeval;
+
+		same = same && white.draw(255, 255, 255);
+		same = same && dim.draw(255, 0, 255);
 	} else if (state == 3) {
 		output[0] = (int) (constrain(rbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[1] = (int) (constrain(gbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
@@ -107,13 +109,13 @@ void draw() {
 		same = same && rbar.draw(255, 0, 0);
 		same = same && gbar.draw(0, 255, 0);
 		same = same && bbar.draw(0, 0, 255);
+		same = same && white.draw(255, 255, 255);
+		same = same && dim.draw(255, 0, 255);
 	}
 
 
 	outputToArduino(output[0], output[1], output[2]);
 
-	same = same && white.draw(255, 255, 255);
-	same = same && dim.draw(255, 0, 255);
 	same = same && stat.draw(0, 0, 255);
 	if(networking){
 		if(race_buffer > 0) race_buffer--;
@@ -203,7 +205,7 @@ void requestData() {
 		gbar.setVal((float) res[1]);
 		bbar.setVal((float) res[2]);
 		JSONObject nu_mus = json.getJSONObject("music");
-		mc.setSettings(nu_mus.getInt("max"), nu_mus.getInt("sat"), nu_mus.getInt("smooth"));
+		mc.setSettings(nu_mus.getInt("max"), nu_mus.getInt("sat"), nu_mus.getInt("h_smooth"), nu_mus.getInt("b_smooth"), nu_mus.getInt("center"));
 		fc.setFadeSpeed((float) json.getInt("fade_speed"));
 		stat.val = json.getInt("lightmode") - 1;
 	}
@@ -220,7 +222,7 @@ int[] hexToRGB(String hex){
 String[] portList(){
 	List<String> res = new ArrayList<String>();
 	for(String port : Serial.list()){
-		if(port.substring(0, 9).equals("/dev/ttyS")) continue;
+		if(port.length() >= 9 && port.substring(0, 9).equals("/dev/ttyS")) continue;
 		res.add(port);
 	}
 
