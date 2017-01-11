@@ -1,10 +1,10 @@
 debug: false
 
-fullscreen: false
+fullscreen: true
 
 # If the serial port isn't connecting, try incrementing this
 serial_offset: 0
 
-networking: true
+networking: false
 
-api_key: pnyQoiBguY8Vz6sCfNIj
+api_key: 123default123

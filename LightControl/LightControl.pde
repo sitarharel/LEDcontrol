@@ -16,8 +16,8 @@ String webstatic = "";
 JSONObject webfade = new JSONObject();
 int webstate = 3;
 
-// String base_url = "http://sitarbucks.com";
-String base_url = "http://localhost:8000";
+String base_url = "http://sitarbucks.com";
+// String base_url = "http://localhost:8000";
 
 int[] oldRGBoutput = {0, 0, 0};
 
