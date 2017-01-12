@@ -20,6 +20,7 @@ String api_key = "";
 int serial_offset = 0;
 
 boolean isarduino = true;
+boolean noAudio = false;
 
 float red_v, green_v, blue_v, dim, white, fadespeed;
 
@@ -54,7 +55,7 @@ void setup() {
 		mc = new MusicControl();
 	} catch (NullPointerException e){
 		System.out.println("Audio line in not found, ensure that your microphone works or an audio line in is set. Setting state to static.");
-		state = 3;
+		noAudio = true;
 	}
 
 	fc = new FadeControl();
@@ -69,16 +70,16 @@ void setup() {
 void draw() {
 	background(0);
 
-	if(oldstate != state) mc.stop();
+	if(oldstate != state && !noAudio) mc.stop();
 	boolean same = true;
-	if (state == 1) {
+	if (!noAudio && state == 1) {
 		if(oldstate != state) mc.init();
 		int[] musicval = mc.doMusicControl();
 		output = musicval;
 	} else if (state == 2) {
 		int[] fadeval = fc.doFadeControl();
 		output = fadeval;
-	} else if (state == 3) {
+	} else {
 		output[0] = (int) (constrain(red_v, 0, 255) * dim * (1 - white) + 255 * white * dim);
 		output[1] = (int) (constrain(green_v, 0, 255) * dim * (1 - white) + 255 * white * dim);
 		output[2] = (int) (constrain(blue_v, 0, 255) * dim * (1 - white) + 255 * white * dim);
@@ -129,7 +130,7 @@ void outputToArduino(int r, int g, int b){
 }
 
 void stop() {
-	mc.stop();
+	if(!noAudio) mc.stop();
 	super.stop();
 }
 
@@ -148,7 +149,7 @@ void requestData() {
 		white = json.getFloat("white");
 		dim = json.getFloat("bright");
 		JSONObject nu_mus = json.getJSONObject("music");
-		mc.setSettings(nu_mus.getInt("max"), nu_mus.getInt("sat"), nu_mus.getInt("h_smooth"), nu_mus.getInt("b_smooth"), nu_mus.getInt("center"));
+		if(!noAudio) mc.setSettings(nu_mus.getInt("max"), nu_mus.getInt("sat"), nu_mus.getInt("h_smooth"), nu_mus.getInt("b_smooth"), nu_mus.getInt("center"));
 		fc.setFadeSpeed((float) json.getInt("fade_speed"));
 		state = json.getInt("lightmode");
 	}
