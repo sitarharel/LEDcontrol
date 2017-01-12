@@ -4,27 +4,23 @@ class FadeControl {
 
     int[] currentfade = {0, 255, 0};
     boolean settings_changed = true;
+    float fadespeed = 12.0;
 
     FadeControl() {
-        fadespeed = new Bar("speed", 200, new PVector(0, 100), fdelay);
+        fadespeed = (float) fdelay;
     }
 
     int[] doFadeControl() {
-        settings_changed = fadespeed.draw(0, 0, 255);
-        fdelay = (int) fadespeed.val;
+        fdelay = (int) fadespeed;
         return fadeCoded(fdelay);
     }
 
     void setFadeSpeed(float speed) {
-        fadespeed.setVal(speed);
-    }
-
-    public boolean settingsChanged(){
-        return settings_changed;
+        fadespeed = speed;
     }
 
     float getFadeSpeed() {
-        return fadespeed.val;
+        return fadespeed;
     }
 
     int[] fadeCoded(int d) {
@@ -32,9 +28,9 @@ class FadeControl {
         //this is an encoding of the fade order
         int[][] f = {{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}, {0, -1, 0}, {1, 0, 0}, {0, 0, -1}};
         currentfade = getNextFade(currentfade, f[fadenum][0], f[fadenum][1], f[fadenum][2]);
-        int rq = (int) (constrain(currentfade[0], 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
-        int gq = (int) (constrain(currentfade[1], 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
-        int bq = (int) (constrain(currentfade[2], 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
+        int rq = (int) (constrain(currentfade[0], 0, 255) * dim * (1 - white) + 255 * white * dim);
+        int gq = (int) (constrain(currentfade[1], 0, 255) * dim * (1 - white) + 255 * white * dim);
+        int bq = (int) (constrain(currentfade[2], 0, 255) * dim * (1 - white) + 255 * white * dim);
         int[] ret = {rq, gq, bq};
         delay(d);
         if (currentfade[0] < 0 || currentfade[0] > 255 || currentfade[1] < 0 || currentfade[1] > 255 || currentfade[2] < 0 || currentfade[2] > 255) {

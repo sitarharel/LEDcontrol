@@ -1,7 +1,5 @@
 debug: false
 
-fullscreen: true
-
 # If the serial port isn't connecting, try incrementing this
 serial_offset: 0
 
