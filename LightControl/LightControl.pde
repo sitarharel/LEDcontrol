@@ -9,7 +9,6 @@ int state = 1;
 int[] interRGB = {0, 0, 0};
 
 String base_url = "http://sitarbucks.com";
-// String base_url = "http://localhost:8000";
 
 int[] oldRGBoutput = {0, 0, 0};
 
@@ -18,6 +17,7 @@ boolean networking = false;
 boolean fullscreen = true;
 String api_key = "";
 int serial_offset = 0;
+boolean raspi = false;
 
 boolean isarduino = true;
 boolean noAudio = false;
@@ -33,7 +33,6 @@ int race_buffer = 0;
 void settings() {
 	// size(1500, 800, P3D);
 	loadSettings();
-	// if(!debug && fullscreen) fullScreen();
 }
 
 void setup() {
@@ -115,9 +114,10 @@ void attemptConnect(String[] ports){
 }
 
 void outputToArduino(int r, int g, int b){
-	r = constrain(r, 0, 255);
-	g = constrain(g, 0, 255);
-	b = constrain(b, 0, 255);
+	int div = (raspi ? 100 : 1);
+	r = constrain(r/div, 0, 255);
+	g = constrain(g/div, 0, 255);
+	b = constrain(b/div, 0, 255);
 
 	int allowedchange = 1;
 
@@ -192,6 +192,9 @@ void loadSettings(){
 					break;
 				case "debug":  
 					if(setting[1].equals("true")) debug = true;
+					break;
+				case "raspberry_pi":  
+					if(setting[1].equals("true")) raspi = true;
 					break;
 				default: break;
 			}	
