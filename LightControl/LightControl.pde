@@ -203,6 +203,8 @@ void requestData() {
 		rbar.setVal((float) res[0]);
 		gbar.setVal((float) res[1]);
 		bbar.setVal((float) res[2]);
+		white.setVal(json.getFloat("white")/100);
+		dim.setVal(json.getFloat("bright")/100);
 		JSONObject nu_mus = json.getJSONObject("music");
 		mc.setSettings(nu_mus.getInt("max"), nu_mus.getInt("sat"), nu_mus.getInt("h_smooth"), nu_mus.getInt("b_smooth"), nu_mus.getInt("center"));
 		fc.setFadeSpeed((float) json.getInt("fade_speed"));
