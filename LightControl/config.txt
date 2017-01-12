@@ -1,7 +1,5 @@
 debug: false
 
-raspberry_pi: false
-
 # If the serial port isn't connecting, try incrementing this
 serial_offset: 0
 

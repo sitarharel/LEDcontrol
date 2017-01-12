@@ -17,7 +17,6 @@ boolean networking = false;
 boolean fullscreen = true;
 String api_key = "";
 int serial_offset = 0;
-boolean raspi = false;
 
 boolean isarduino = true;
 boolean noAudio = false;
@@ -80,9 +79,9 @@ void draw() {
 		int[] fadeval = fc.doFadeControl();
 		output = fadeval;
 	} else {
-		output[0] = (int) (constrain(red_v, 0, 255) * dim * (1 - white) + 255 * white * dim);
-		output[1] = (int) (constrain(green_v, 0, 255) * dim * (1 - white) + 255 * white * dim);
-		output[2] = (int) (constrain(blue_v, 0, 255) * dim * (1 - white) + 255 * white * dim);
+		output[0] = (int) (constrain(red_v, 0, 255));
+		output[1] = (int) (constrain(green_v, 0, 255));
+		output[2] = (int) (constrain(blue_v, 0, 255));
 	}
 
 	outputToArduino(output[0], output[1], output[2]);
@@ -115,12 +114,9 @@ void attemptConnect(String[] ports){
 }
 
 void outputToArduino(int r, int g, int b){
-	int div = (raspi ? 100 : 1);
-	r = constrain(r/div, 0, 255);
-	g = constrain(g/div, 0, 255);
-	b = constrain(b/div, 0, 255);
-
-	if(debug) System.out.println("(" + r + ", " + g + ", " + b + ")");
+	r = constrain(r, 0, 255);
+	g = constrain(g, 0, 255);
+	b = constrain(b, 0, 255);
 
 	int allowedchange = 1;
 	if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
@@ -148,12 +144,21 @@ void requestData() {
 		red_v = (float) res[0];
 		green_v = (float) res[1];
 		blue_v = (float) res[2];
-		white = json.getFloat("white");
-		dim = json.getFloat("bright");
+		white = json.getFloat("white")/100;
+		dim = json.getFloat("bright")/100;
 		JSONObject nu_mus = json.getJSONObject("music");
 		if(!noAudio) mc.setSettings(nu_mus.getInt("max"), nu_mus.getInt("sat"), nu_mus.getInt("h_smooth"), nu_mus.getInt("b_smooth"), nu_mus.getInt("center"));
 		fc.setFadeSpeed((float) json.getInt("fade_speed"));
 		state = json.getInt("lightmode");
+		if(debug) System.out.println("{ lightmode: " + state + 
+			", static: " + json.getString("static") + 
+			", fade_speed: " + json.getInt("fade_speed") +
+			", white: " + white + ", bright: " + dim + 
+			", music: {max: " + nu_mus.getInt("max") + 
+			", sat: " + nu_mus.getInt("sat") + 
+			", h_smooth: " + nu_mus.getInt("h_smooth") +
+			", b_smooth: " + nu_mus.getInt("b_smooth") +
+			", center: " + nu_mus.getInt("center") + "} }" );
 	}
 }
 
@@ -194,9 +199,6 @@ void loadSettings(){
 					break;
 				case "debug":  
 					if(setting[1].equals("true")) debug = true;
-					break;
-				case "raspberry_pi":  
-					if(setting[1].equals("true")) raspi = true;
 					break;
 				default: break;
 			}	
