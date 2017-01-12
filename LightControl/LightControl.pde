@@ -45,8 +45,7 @@ void setup() {
 
 	String[] ports = portList();
 	if (!debug && ports.length > serial_offset) {
-		port = new Serial(this, ports[serial_offset], 57600);
-		System.out.println("Connected to port: " + ports[serial_offset]);
+		attemptConnect(ports);
 	} else {
 		isarduino = false;
 		System.out.println("No connection initially found.");
@@ -88,14 +87,25 @@ void draw() {
 
 	String[] ports = portList();
 	if (!debug && !isarduino && ports.length > serial_offset) {
-		port = new Serial(this, ports[serial_offset], 57600);
-		System.out.println("Connected to port: " + ports[serial_offset]);
-		isarduino = true;
+		attemptConnect(ports);
 	}
 	if (debug || isarduino && ports.length <= serial_offset) {
 		isarduino = false;
 	}
 	oldstate = state;
+}
+
+void attemptConnect(String[] ports){
+	try {
+		port = new Serial(this, ports[serial_offset], 57600);
+		isarduino = true;
+		System.out.println("Connected to port: " + ports[serial_offset]);
+	} catch (RuntimeException e) {
+		System.out.println(e);
+		System.out.println("Incrementing serial_offset");
+		isarduino = false;
+		serial_offset++;
+	}
 }
 
 void outputToArduino(int r, int g, int b){
