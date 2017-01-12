@@ -193,9 +193,8 @@ void stop() {
 
 // This happens as a separate thread and can take as long as it wants
 void requestData() {
-	// {webcontrol: false, lightmode: 3, music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 180, g: 0, b: 50} };
-	JSONObject json = loadJSONObject(base_url + "/api/" + api_key + "/get_light_state");
-	// GetRequest get = new GetRequest(base_url + "/api/" + api_key + "/get_light_state");
+	JSONObject json = loadJSONObject(base_url + "/api/" + api_key + "/get_state");
+	// GetRequest get = new GetRequest(base_url + "/api/" + api_key + "/get_state");
 	// get.send();
 	// println(" " + get.getContent());
 
