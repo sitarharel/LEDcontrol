@@ -50,8 +50,13 @@ void setup() {
 		isarduino = false;
 		System.out.println("No connection initially found.");
 	}
+	try {
+		mc = new MusicControl();
+	} catch (NullPointerException e){
+		System.out.println("Audio line in not found, ensure that your microphone works or an audio line in is set. Setting state to static.");
+		state = 3;
+	}
 
-	mc = new MusicControl();
 	fc = new FadeControl();
 
 	white = 0;
