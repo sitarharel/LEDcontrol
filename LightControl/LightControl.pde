@@ -55,6 +55,7 @@ void setup() {
 	} catch (NullPointerException e){
 		System.out.println("Audio line in not found, ensure that your microphone works or an audio line in is set. Setting state to static.");
 		noAudio = true;
+		state = 3;
 	}
 
 	fc = new FadeControl();
@@ -119,8 +120,9 @@ void outputToArduino(int r, int g, int b){
 	g = constrain(g/div, 0, 255);
 	b = constrain(b/div, 0, 255);
 
-	int allowedchange = 1;
+	if(debug) System.out.println("(" + r + ", " + g + ", " + b + ")");
 
+	int allowedchange = 1;
 	if(isarduino && (abs(oldRGBoutput[0] - r) > allowedchange || abs(oldRGBoutput[1] - g) > allowedchange || abs(oldRGBoutput[2] - b) > allowedchange)){
 		byte[] send = {(byte)(r - 128), (byte)(g - 128), (byte)(b - 128)};
 		port.write(send);
