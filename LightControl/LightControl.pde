@@ -11,6 +11,7 @@ int state = 1;
 boolean webcontrol = false;
 int[] interRGB = {0, 0, 0};
 
+boolean noAudio = false;
 boolean queuePost = false;
 String webstatic = "";
 JSONObject webfade = new JSONObject();
@@ -60,12 +61,20 @@ void setup() {
 
 	String[] ports = portList();
 	if (!debug && ports.length > serial_offset) {
-		port = new Serial(this, ports[serial_offset], 57600);
-	} else {
-		isarduino = false;
+		attemptConnect(ports);
+ 	} else {
+ 		isarduino = false;
+		System.out.println("No connection initially found.");
 	}
 
-	mc = new MusicControl();
+	try {
+		mc = new MusicControl();
+	} catch (NullPointerException e){
+		System.out.println("Audio line in not found, ensure that your microphone works or an audio line in is set. Setting state to static.");
+		noAudio = true;
+		state = 3;
+ 	}
+
 	fc = new FadeControl();
 
 	white = new Bar("white", 50, new PVector(0, 1), partswhite);
@@ -87,9 +96,10 @@ void draw() {
 	dimness = dim.val;
 
 	state = stat.val + 1;
-	if(oldstate != state) mc.stop();
+	if(oldstate != state && !noAudio) mc.stop();
 	boolean same = true;
-	if (state == 1) {
+
+	if (!noAudio && state == 1) {
 		if(oldstate != state) mc.init();
 		int[] musicval = mc.doMusicControl();
 		output = musicval;
@@ -102,7 +112,7 @@ void draw() {
 
 		same = same && white.draw(255, 255, 255);
 		same = same && dim.draw(255, 0, 255);
-	} else if (state == 3) {
+	} else {
 		output[0] = (int) (constrain(rbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[1] = (int) (constrain(gbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
 		output[2] = (int) (constrain(bbar.val, 0, 255) * dimness * (1 - partswhite) + 255 * partswhite * dimness);
@@ -133,13 +143,26 @@ void draw() {
 
 	String[] ports = portList();
 	if (!debug && !isarduino && ports.length > serial_offset) {
-		port = new Serial(this, ports[serial_offset], 57600);
-		isarduino = true;
+		attemptConnect(ports);
 	} 
+
 	if (debug || isarduino && ports.length <= serial_offset) {
 		isarduino = false;
 	}
 	oldstate = state;
+}
+
+void attemptConnect(String[] ports){
+	try {
+		port = new Serial(this, ports[serial_offset], 57600);
+		isarduino = true;
+		System.out.println("Connected to port: " + ports[serial_offset]);
+	} catch (RuntimeException e) {
+		System.out.println(e);
+		System.out.println("Incrementing serial_offset");
+		isarduino = false;
+		serial_offset++;
+	}
 }
 
 void outputToArduino(int r, int g, int b){
@@ -174,7 +197,9 @@ void outputToArduino(int r, int g, int b){
 void makePost(){
 	// {webcontrol: false, lightmode: 3, music: {}, fade: {speed: 12, dim: 1, white: 0}, static: {r: 0, g: 0, b: 50} };
 	// String s = webconn.selected ? "true" : "false";
-	PostRequest post = new PostRequest(base_url + "/api/" + api_key + "/update_light_state");
+	if(debug) System.out.println("making post");
+
+	PostRequest post = new PostRequest(base_url + "/api/" + api_key + "/update_state");
 
 	post.addData("webcontrol", "false");
 	post.addData("lightmode", Integer.toString(stat.val + 1));
@@ -187,7 +212,7 @@ void makePost(){
 }
 
 void stop() {
-	mc.stop();
+	if(!noAudio) mc.stop();
 	super.stop();
 }
 
@@ -206,9 +231,18 @@ void requestData() {
 		white.setVal(json.getFloat("white")/100);
 		dim.setVal(json.getFloat("bright")/100);
 		JSONObject nu_mus = json.getJSONObject("music");
-		mc.setSettings(nu_mus.getInt("max"), nu_mus.getInt("sat"), nu_mus.getInt("h_smooth"), nu_mus.getInt("b_smooth"), nu_mus.getInt("center"));
+		if(!noAudio) mc.setSettings(nu_mus.getInt("max"), nu_mus.getInt("sat"), nu_mus.getInt("h_smooth"), nu_mus.getInt("b_smooth"), nu_mus.getInt("center"));
 		fc.setFadeSpeed((float) json.getInt("fade_speed"));
 		stat.val = json.getInt("lightmode") - 1;
+		if(debug) System.out.println("{ lightmode: " + (stat.val + 1) + 
+			", static: " + json.getString("static") + 
+			", fade_speed: " + json.getInt("fade_speed") +
+			", white: " + white.val + ", bright: " + dim.val + 
+			", music: {max: " + nu_mus.getInt("max") + 
+			", sat: " + nu_mus.getInt("sat") + 
+			", h_smooth: " + nu_mus.getInt("h_smooth") +
+			", b_smooth: " + nu_mus.getInt("b_smooth") +
+			", center: " + nu_mus.getInt("center") + "} }" );
 	}
 }
 
