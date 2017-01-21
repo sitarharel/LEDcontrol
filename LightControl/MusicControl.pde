@@ -1,5 +1,6 @@
 import ddf.minim.*;
 import ddf.minim.analysis.*;
+import javax.sound.sampled.*;
 
 class MusicControl {
     FFT fft;
@@ -26,7 +27,13 @@ class MusicControl {
     void init(){
         // stop();
         minim = new Minim(this);
-        song = minim.getLineIn();
+        if(raspberry_pi){
+            Mixer.Info mixer_info = AudioSystem.getMixerInfo()[0];
+            minim.setInputMixer(AudioSystem.getMixer(mixer_info));
+            song = minim.getLineIn(Minim.MONO, 2048, 48000.0f, 16);
+        }else{   
+            song = minim.getLineIn();
+        }
         song.enableMonitoring();
         song.mute();
         fft = new FFT(song.bufferSize(), 2048);

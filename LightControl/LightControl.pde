@@ -15,6 +15,7 @@ int[] oldRGBoutput = {0, 0, 0};
 boolean debug = false;
 boolean networking = false;
 boolean fullscreen = true;
+boolean raspberry_pi = false;
 String api_key = "";
 int serial_offset = 0;
 
@@ -199,6 +200,9 @@ void loadSettings(){
 					break;
 				case "debug":  
 					if(setting[1].equals("true")) debug = true;
+					break;
+				case "raspberry_pi":  
+					if(setting[1].equals("true")) raspberry_pi = true;
 					break;
 				default: break;
 			}	
