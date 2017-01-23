@@ -16,7 +16,7 @@ class Bar {
 
     boolean draw(float r, float g, float b) {
         float oldval = val;
-        update();
+        boolean updated = update();
         x = width - distwidth;
         color l = color(r * 0.5, g * 0.5, b * 0.5);
         fill(l);
@@ -35,14 +35,16 @@ class Bar {
         textAlign(CENTER, CENTER);
         text(val, x, y);
         text(name, x, height - 7 - h / 2);
-        return val == oldval;
+        return val == oldval && !updated;
     }
 
-    void update() {
+    boolean update() {
         if (mousePressed && mouseX <= x + w / 2 && mouseX >= x - w / 2) {
             val = 0 + (((float)height - 40 - mouseY) / ((float) height - 60) * (scale.y - scale.x)) + scale.x;
             val = constrain(val, scale.x, scale.y);
+            return true;
         }
+        return false;
     }
 
     void setVal(float v){
