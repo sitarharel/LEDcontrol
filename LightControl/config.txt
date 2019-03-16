@@ -1,10 +1,11 @@
 debug: false
 
-raspberry_pi: false
+raspberry_pi: true
 
 # If the serial port isn't connecting, try incrementing this
-serial_offset: 0
+serial_offset: 2
 
-networking: false
+networking: true
 
-api_key: 123default123
+api_key: 9PgZVaeFw8A1Cx7N6iWL
+

@@ -8,7 +8,7 @@ Serial port;
 int state = 1;
 int[] interRGB = {0, 0, 0};
 
-String base_url = "http://sitarbucks.com";
+String base_url = "http://haus.sitarbucks.com";
 
 int[] oldRGBoutput = {0, 0, 0};
 
